@@ -1,0 +1,40 @@
+﻿<table class="table table-striped table-bordered">
+    <th class="col-sm-1">部件</th>
+    <th class="col-sm-1">颜色</th>
+    <th class="col-sm-1">单双面</th>
+    <th class="col-sm-1">盒型</th>
+    <th class="col-sm-1">印刷机</th>
+    <th class="col-sm-1">印刷尺寸(长)</th>
+    <th class="col-sm-1">印刷尺寸(宽)</th>
+    <th class="col-sm-1">开纸类型</th>
+    <th class="col-sm-1">印版套数</th>
+    <th class="col-sm-1">拼版方式</th>
+    <th class="col-sm-1">每版拼数</th>
+    <th class="col-sm-1">每版印数</th>
+    <th class="col-sm-1">纸张正数</th>
+    <th class="col-sm-1">纸张放数</th>
+    <th class="col-sm-1">纸张费用</th>
+    <th class="col-sm-1">印工费</th>
+    <th class="col-sm-1">后工费</th>
+    <th class="col-sm-1">总额(无利润)</th>
+    <tr ng-repeat="item in selectedResult.quotePartPinbanInfos">
+        <td >{{item.subPartName}}</td>
+        <td >{{item.color}}</td>
+        <td >{{item.side}}</td>
+        <td >{{item.subPartName}}</td>
+        <td >{{item.machineName}}</td>
+        <td >{{item.printLength}}</td>
+        <td >{{item.printWidth}}</td>
+        <td >{{item.paperScaleAndCutNumber}}</td>
+        <td >{{item.numOfPrintPlate}}</td>
+        <td >{{item.pinbanMethod}}</td>
+        <td >{{item.duplicatedOnEachPrintPlate}}</td>
+        <td >{{item.printQuantity}}</td>
+        <td >{{item.paperQuantity}}</td>
+        <td >{{item.paperExtraQuantity}}</td>
+        <td >{{item.costOfMaterial}}</td>
+        <td >{{item.costOfPrinting}}</td>
+        <td >{{item.costOfAfterPrintTechnics}}</td>
+        <td >{{item.totalWithoutProfit}}</td>
+    </tr>
+</table>

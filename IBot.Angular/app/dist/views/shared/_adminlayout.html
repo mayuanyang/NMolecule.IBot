@@ -1,0 +1,70 @@
+
+<div id="wrapper">
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+
+        <div class="navbar-header">
+            <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" ui-sref="quote.quotehome">{{model.companyInfo.companyName}}报价系统-后台管理</a>
+        </div>
+        
+            <ul class="nav navbar-top-links navbar-right">
+                <li><a ui-sref="home.home({id:'{{model.companyId}}'})"><span class="glyphicon glyphicon-home"></span>  公司主页</a></li>
+                <li><a ui-sref="register" ng-if="!model.hasToken"><span class="glyphicon glyphicon-log-in"></span>  登录</a></li>
+                <li ng-if="model.hasToken"><a ui-sref="admin.dashboard"><span class="glyphicon glyphicon-user"></span>  你好 {{model.userName}}</a></li>
+                <li><a href="javascript:void()" ng-click="model.logout()" ng-if="model.hasToken"><span class="glyphicon glyphicon-log-out"></span>  登出</a></li>
+            </ul>
+
+        <div class="navbar-default sidebar" role="navigation">
+            <div class="sidebar-nav navbar-collapse">
+                <ul class="nav" id="side-menu">
+
+                    <li>
+                        <a ui-sref="admin.dashboard"><span class="glyphicon glyphicon-dashboard"></span>  概览表</a>
+                    </li>
+                    <li>
+                        <a ui-sref="admin.quotecategory"><span class="glyphicon glyphicon-cog"></span> 产品设置</a>
+
+                    </li>
+                    <li>
+                        <a ui-sref="admin.home"><span class="glyphicon glyphicon-info-sign"></span> 公司信息</a>
+
+                    </li><li>
+                        <a ui-sref="admin.news"><span class="glyphicon glyphicon-comment"></span> 信息发布</a>
+
+                    </li>
+                    <li>
+                        <a ui-sref="quote.quotehome"><span class="glyphicon glyphicon-tasks"></span> 报价平台</a>
+
+                    </li>
+                </ul>
+            </div>
+            <!-- /.sidebar-collapse -->
+        </div>
+
+    </nav>
+
+    <div id="page-wrapper">
+        
+        <div class="row">
+            <div ng-repeat="item in $root.errorMessages track by $index" class="alert alert-{{item.type}} fade in" role="alert">
+                {{item.message}}
+                <a href="" class="close" data-dismiss="alert" ng-click="$root.errorMessages.splice($index, 1)">x</a>
+            </div>
+            <ol class="breadcrumb" ng-if="$root.showBreadcrumb">
+                <li ng-repeat="link in $root.adminBreadcrumb"><a ui-sref={{link.link}}>{{link.text}}</a></li>
+            </ol>
+        </div>
+        <div class="row">
+            <div cg-busy="{promise:$root.myPromise, message:'努力加载中', minDuration:100, backdrop:true}" style="position: relative;">
+                <ui-view />
+            </div>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,136 @@
+
+    <div class="panel panel-default" ng-repeat="part in model.parts">
+        <div class="panel-heading">{{part.name}}</div>
+        <div class="panel-body">
+            <form name="materialForm">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>纸类</th>
+                            <th>纸度</th>
+                            <th>克重</th>
+                            <th>单位</th>
+                            <th>单价</th>
+                            <th>是否默认</th>
+
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="m in part.materials">
+                        <tr ng-if="!m.isEditing && !m.shouldBeDeleted">
+                            <td>
+                                <span>{{m.materialCategory}}</span>
+                            </td>
+                            <td class="col-md-2">
+                                <span>{{m.paperScale}}</span>
+
+                            </td>
+                            <td>
+                                <span>{{m.gramWeight}}</span>
+
+                            </td>
+                            <td>
+                                <span>{{m.unit}}</span>
+
+                            </td>
+                            <td>
+                                <span>{{m.unitPrice | currency:"￥"}}</span>
+
+                            </td>
+
+                            <td class="col-md-1">
+                                <span ng-if="m.isDefault" class="glyphicon glyphicon-ok"></span>
+                            </td>
+                            <td class="col-md-2">
+                                <div class="btn-group pull-right" role="group" aria-label="...">
+
+                                    <button ng-if="!m.isEditing" class="btn btn-sm btn-primary" ng-click="m.isEditing = true;">修改</button>
+                                    <button ng-if="m.isEditing" class="btn btn-sm btn-primary" ng-click="m.isEditing = false;">取消</button>
+                                    <button ng-if="!m.shouldBeDeleted" class="btn btn-danger btn-sm" ng-click="model.remove(part, $index)">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr ng-if="m.isEditing && !m.shouldBeDeleted">
+                            <td>
+                                <div class="form-group input-group" ng-if="m.isEditing">
+                                    <span class="input-group-addon" id="spMaterialCategory">纸类别</span>
+                                    <input type="text" class="form-control" aria-describedby="spMaterialCategory" placeholder="铜板纸" ng-model="m.materialCategory" required />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group input-group" ng-if="m.isEditing">
+                                    <span class="input-group-addon" id="spPaperScale">纸度</span>
+                                    <div class="btn-group" aria-describedby="spPaperScale">
+                                        <button type="button" class="btn btn-default">{{m.paperScale}}</button>
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="caret"></span>
+                                            <span class="sr-only">Toggle</span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="javascript:void()" ng-click="m.paperScale='大度'">大度</a></li>
+                                            <li><a href="javascript:void()" ng-click="m.paperScale='正度'">正度</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group input-group" ng-if="m.isEditing">
+                                    <span class="input-group-addon" id="spGram">克重</span>
+                                    <input type="number" class="form-control" aria-describedby="spGram"  step="1" placeholder="克重" ng-model="m.gramWeight" required />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group input-group" ng-if="m.isEditing">
+                                    <span class="input-group-addon" id="spUnit">单位</span>
+                                    <div class="btn-group" aria-describedby="spUnit">
+                                        <button type="button" class="btn btn-default">{{m.unit}}</button>
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="caret"></span>
+                                            <span class="sr-only">Toggle</span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="javascript:void()" ng-click="m.unit='吨'">吨</a></li>
+                                            <li><a href="javascript:void()" ng-click="m.unit='令'">令</a></li>
+                                            <li><a href="javascript:void()" ng-click="m.unit='张'">张</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group input-group" ng-if="m.isEditing">
+                                    <span class="input-group-addon" id="spUnitPrice">单价</span>
+                                    <input type="number" class="form-control"  step="0.1" aria-describedby="spUnitPrice" ng-model="m.unitPrice" required />
+                                </div>
+                            </td>
+                            <td class="col-md-1"><input type="checkbox" ng-model="m.isDefault" ng-change="m.isDefault=true; model.toggleIsDefault(part, m)" /></td>
+                            <td class="col-md-2">
+                                <div class="btn-group pull-right" role="group" aria-label="...">
+
+                                    <button ng-if="!m.isEditing" class="btn btn-sm btn-primary" ng-click="m.isEditing = true;">修改</button>
+                                    <button ng-if="m.isEditing" class="btn btn-sm btn-primary" ng-click="m.isEditing = false;">取消</button>
+                                    <button ng-if="!m.shouldBeDeleted" class="btn btn-danger btn-sm" ng-click="model.remove(part, $index)">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tr>
+                        <td colspan="7">
+                            <div class="btn-group pull-right" role="group" aria-label="...">
+                                <button class="btn btn-primary" ng-click="model.add(part)">
+                                    添加
+                                </button>
+                                <button class="btn btn-success" ng-click="model.save()">
+                                    保存
+                                </button>
+                            </div>
+
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+
+<div ng-if="model.parts.length==0">
+    部件尚未被设置
+</div>

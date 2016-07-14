@@ -1,0 +1,222 @@
+<form name="technicsForm">
+    <div class="panel panel-default" ng-repeat="part in model.parts">
+        <div class="panel-heading">{{part.name}}</div>
+        <div class="panel-body">
+
+            <div class="panel panel-default" ng-repeat="g in part.groups">
+                <div class="panel-heading">{{g.name}}</div>
+                <div class="panel-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th>是否整合到下拉菜单</th>
+                                <th>是否必选项</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-if="!g.isEditing && !g.shouldBeDeleted" ng-click="g.selected=!g.selected">
+                                <td>
+                                    <span>{{g.name}}</span>
+                                </td>
+                                <td class="col-md-2">
+                                    <span ng-if="g.consolidated" class="glyphicon glyphicon-ok"></span>
+                                    <span ng-if="!g.consolidated" class="glyphicon glyphicon-remove"></span>
+                                </td>
+
+                                <td>
+                                    <span ng-if="g.requireSelection" class="glyphicon glyphicon-ok"></span>
+                                </td>
+                                <td class="col-md-2">
+                                    <div class="btn-group pull-right" role="group" aria-label="...">
+
+                                        <button ng-if="!g.isEditing" class="btn btn-sm btn-primary" ng-click="g.isEditing = true;">修改</button>
+                                        <button ng-if="g.isEditing" class="btn btn-sm btn-primary" ng-click="g.isEditing = false;">取消</button>
+                                        <button ng-if="!g.shouldBeDeleted" class="btn btn-danger btn-sm" ng-click="model.remove(part, $index)">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr ng-if="g.isEditing && !g.shouldBeDeleted" ng-click="g.selected=!g.selected">
+                                <!--Edit-->
+                                <td class="col-md-2">
+                                    <div class="form-group input-group" ng-if="g.isEditing">
+                                        <span class="input-group-addon" id="spMaterialCategory">名称</span>
+                                        <input type="text" class="form-control" aria-describedby="spMaterialCategory" ng-model="g.name" required />
+                                    </div>
+                                </td>
+                                <td class="col-md-2">
+                                    <div class="form-group input-group" ng-if="g.isEditing">
+                                        <input type="checkbox" ng-model="g.consolidated" aria-describedby="spConsolidated" />
+                                    </div>
+                                </td>
+                                <td class="col-md-2">
+                                    <div class="form-group input-group" ng-if="g.isEditing">
+                                        <input type="checkbox" aria-describedby="spRequire" ng-model="g.requireSelection" />
+                                    </div>
+                                </td>
+
+                                <td class="col-md-2">
+                                    <div class="btn-group pull-right" role="group" aria-label="...">
+
+                                        <button ng-if="!g.isEditing" class="btn btn-sm btn-primary" ng-click="g.isEditing = true;">修改</button>
+                                        <button ng-if="g.isEditing" class="btn btn-sm btn-primary" ng-click="g.isEditing = false;">取消</button>
+                                        <button ng-if="!g.shouldBeDeleted" class="btn btn-danger btn-sm" ng-click="model.remove(part, $index)">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr ng-if="g.selected">
+                                <td colspan="4">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">工艺</div>
+                                        <div class="panel-body">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>名称</th>
+                                                        <th>单价(元)</th>
+                                                        <th>单位</th>
+                                                        <th>最低费用</th>
+                                                        <th>模板费</th>
+                                                        <th>模板收费方式</th>
+                                                        <th>需要长宽信息</th>
+                                                        <th>数量计算方式</th>
+
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody ng-repeat="t in g.technicses">
+                                                    <tr ng-if="!g.isEditing && !t.shouldBeDeleted">
+                                                        <td>{{t.name}}</td>
+                                                        <td>{{t.unitPricePerProductionUnit | currency: "￥"}}</td>
+                                                        <td>{{t.unitType}}</td>
+                                                        <td>{{t.minimumCost | currency: "￥"}}</td>
+                                                        <td>{{t.templateCost | currency: "￥"}}</td>
+                                                        <td>{{t.templateUnitType}}</td>
+                                                        <td>
+                                                            <span ng-if="t.isRequiredExtraData" class="glyphicon glyphicon-ok"></span>
+                                                            <span ng-if="!t.isRequiredExtraData" class="glyphicon glyphicon-remove"></span>
+                                                        </td>
+                                                        <td>
+                                                            <span ng-if="t.quantityCalculationType == 'ProductionQuantity'">按成品数</span>
+                                                            <span ng-if="t.quantityCalculationType == 'OperationQuantity'">按车头数</span>
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-danger btn-sm pull-right" ng-click="model.removeTechnics(t, $index)">
+                                                                <span class="glyphicon glyphicon-remove"></span>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr ng-if="g.isEditing && !t.shouldBeDeleted">
+                                                        <td><input type="text" ng-model="t.name" class="form-control" /></td>
+                                                        <td class="col-md-1">
+                                                            <input type="number" step="0.01" ng-model="t.unitPricePerProductionUnit" class="form-control" />
+                                                        </td>
+                                                        <td>
+                                                            <div class="btn-group">
+                                                                <button type="button" class="btn btn-default">
+                                                                    {{t.unitType}}
+                                                                </button>
+                                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                    <span class="caret"></span>
+                                                                    <span class="sr-only">Toggle</span>
+                                                                </button>
+                                                                <ul class="dropdown-menu">
+                                                                    <li ng-repeat="ut in model.data.unitTypes"><a href="javascript:void()" ng-click="t.unitType=ut">{{ut}}</a></li>
+                                                                    <li>
+                                                                        <div class="form-group input-group">
+                                                                            <span class="input-group-addon" id="spUnitType">自定义</span>
+                                                                            <input type="text" placeholder="其他" class="form-control" ng-model="t.unitType" aria-describedby="spUnitType" />
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                        <td class="col-md-1">
+                                                            <input type="number" step="1" ng-model="t.minimumCost" class="form-control" />
+                                                        </td>
+                                                        <td class="col-md-1">
+                                                            <input type="number" step="1" ng-model="t.templateCost" class="form-control" />
+                                                        </td>
+                                                        <td>
+                                                            <div class="btn-group">
+                                                                <button type="button" class="btn btn-default">
+                                                                    {{t.templateUnitType}}
+                                                                </button>
+                                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                    <span class="caret"></span>
+                                                                    <span class="sr-only">Toggle</span>
+                                                                </button>
+                                                                <ul class="dropdown-menu">
+                                                                    <li ng-repeat="ut in model.data.templateUnitTypes"><a href="javascript:void()" ng-click="t.templateUnitType=ut">{{ut}}</a></li>
+                                                                    <li>
+                                                                        <div class="form-group input-group">
+                                                                            <span class="input-group-addon" id="spTemplateUnitType">自定义</span>
+                                                                            <input type="text" placeholder="其他" class="form-control" ng-model="t.templateUnitType" aria-describedby="spTemplateUnitType" />
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <input type="checkbox" ng-model="t.isRequiredExtraData" />
+                                                        </td>
+                                                        <td>
+                                                            <div class="btn-group">
+                                                                <button type="button" class="btn btn-default">
+                                                                    <span ng-if="t.quantityCalculationType == 'ProductionQuantity'">按成品数</span>
+                                                                    <span ng-if="t.quantityCalculationType == 'OperationQuantity'">按车头数</span>
+                                                                </button>
+                                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                    <span class="caret"></span>
+                                                                    <span class="sr-only">Toggle</span>
+                                                                </button>
+                                                                <ul class="dropdown-menu">
+                                                                    <li><a href="javascript:void()" ng-click="t.quantityCalculationType = 'ProductionQuantity'">按成品数</a></li>
+                                                                    <li><a href="javascript:void()" ng-click="t.quantityCalculationType = 'OperationQuantity'">按车头数</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-danger btn-sm pull-right" ng-click="model.removeTechnics(t, $index)">
+                                                                <span class="glyphicon glyphicon-remove"></span>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                <tr>
+                                                    <td colspan="9">
+                                                        <button class="btn btn-primary btn-sm pull-right" ng-click="model.addTechnics(g)">
+                                                            <span class="glyphicon glyphicon-plus"></span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+            <div class="btn-group pull-right" role="group" aria-label="...">
+                <button class="btn btn-primary" ng-click="model.addGroup(part)">
+                    添加
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="form-group">
+        <button class="btn btn-success btn-block" ng-click="model.save()">
+            <span>保存</span>
+        </button>
+    </div>
+</form>
+
+<div ng-if="model.parts.length==0">
+    部件尚未被设置
+</div>
