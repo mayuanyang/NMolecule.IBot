@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -14,7 +15,7 @@ using Serilog;
 
 namespace IBot.Web
 {
-    
+
     public class MessagesController : ApiController
     {
         private readonly IMessageProcessEngine _engine;
@@ -40,7 +41,7 @@ namespace IBot.Web
                     _accRepository.Add(acc);
                 }
             }
-            
+
         }
 
         static IFormDialog<PaymentForm> MakeAddPaymentFormDialog()
@@ -54,39 +55,63 @@ namespace IBot.Web
         /// </summary>
         public async Task<Activity> Post([FromBody]Activity message)
         {
-            if (message.Type == "Message")
+            try
             {
-                _logger.Information("Message received {@message}", message);
-                var luis = await _engine.ProcessMessage(message);
-                if (luis.intents.Length == 0)
+
+
+                var connector = new ConnectorClient(new Uri(message.ServiceUrl));
+                if (message.Type.ToUpper() == "MESSAGE")
                 {
-                    return message.CreateReply("Sorry, i don't understand what you are talking about");
-                }
-                if (luis.intents[0].intent == "GetAccountInfo")
-                {
-                    if (luis.entities.Length > 0)
+                    
+                    var luis = await _engine.ProcessMessage(message);
+
+                    if (luis.intents[0].intent == "GetAccountInfo")
                     {
-                        var msg = message.CreateReply("Account retrieved");
-                        //msg.("Data", _accRepository.SingleOrDefault(x => x.AccountId == luis.entities[0].entity));
-                        return msg;
+                        if (luis.entities.Length > 0)
+                        {
+                            var msg = message.CreateReply("Account retrieved");
+                            msg.Properties.Add(_accRepository.SingleOrDefault(x => x.AccountId == luis.entities[0].entity));
+                            await connector.Conversations.SendToConversationAsync(msg);
+
+                        }
+                        await connector.Conversations.SendToConversationAsync(message.CreateReply("Cannot find account"));
+
                     }
-                    return message.CreateReply("Cannot find account");
+                    if (luis.intents[0].intent == "GetPayments")
+                    {
+                        var account = _accRepository.SingleOrDefault(x => x.AccountId == luis.entities[0].entity);
+                        
+                        //var stateClient = message.GetStateClient();
+                        //var userData = await stateClient.BotState.GetUserDataAsync(message.ChannelId, message.From.Id);
+                        //userData.SetProperty("Data", account);
+                        //await stateClient.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
 
-                }
-                else if (luis.intents[0].intent == "GetPayments")
-                {
+                        var msg =
+                            message.CreateReply(
+                                $"The intent is {luis.intents[0].intent} and entity is {luis.entities[0].entity}");
+                        
+                        msg.Attachments = new List<Attachment>();
+                        msg.Attachments.Add(new Attachment("json", "", account));
+                        await connector.Conversations.SendToConversationAsync(msg);
 
+                    }
+                    if (luis.intents[0].intent == "AddPayment")
+                    {
+                        await connector.Conversations.SendToConversationAsync(message.CreateReply($"The intent is {luis.intents[0].intent} and entity is {luis.entities[0].entity}"));
+                    }
+                  
                 }
-                else if (luis.intents[0].intent == "AddPayment")
+                else
                 {
-                   
+                    await connector.Conversations.SendToConversationAsync(HandleSystemMessage(message));
                 }
-                // return our reply to the user
-                return message.CreateReply($"The intent is {luis.intents[0].intent} and entity is {luis.entities[0].entity}");
+                return null;
             }
-            else
+            catch (Exception ex)
             {
-                return HandleSystemMessage(message);
+                _logger.Error(ex, "An error has occured");
+                //throw;
+                return null;
             }
         }
 
