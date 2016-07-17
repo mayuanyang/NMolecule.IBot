@@ -20,12 +20,14 @@ namespace IBot.Web
     {
         private readonly IMessageProcessEngine _engine;
         private readonly IRepository<Account> _accRepository;
+        private readonly IRepository<Transaction> _txRepository;
         private readonly ILogger _logger;
 
-        public MessagesController(IMessageProcessEngine engine, IRepository<Account> accRepository, ILogger logger)
+        public MessagesController(IMessageProcessEngine engine, IRepository<Account> accRepository, IRepository<Transaction> txRepository, ILogger logger)
         {
             _engine = engine;
             _accRepository = accRepository;
+            _txRepository = txRepository;
             _logger = logger;
             if (_accRepository.List.Count == 0)
             {
@@ -53,7 +55,7 @@ namespace IBot.Web
         /// POST: api/Messages
         /// Receive a message from a user and reply to it
         /// </summary>
-        public async Task<Activity> Post([FromBody]Activity message)
+        public async Task Post([FromBody]Activity message)
         {
             try
             {
@@ -70,30 +72,42 @@ namespace IBot.Web
                         if (luis.entities.Length > 0)
                         {
                             var msg = message.CreateReply("Account retrieved");
-                            msg.Properties.Add(_accRepository.SingleOrDefault(x => x.AccountId == luis.entities[0].entity));
+                            var account = _accRepository.SingleOrDefault(x => x.AccountId == luis.entities[0].entity);
+                            msg.Attachments = new List<Attachment>();
+                            msg.Attachments.Add(new Attachment("application/json", "", account));
                             await connector.Conversations.SendToConversationAsync(msg);
 
                         }
-                        await connector.Conversations.SendToConversationAsync(message.CreateReply("Cannot find account"));
-
+                        else
+                        {
+                            var msg = message.CreateReply("Account not found");
+                            await connector.Conversations.SendToConversationAsync(msg);
+                        }
+                        
                     }
                     if (luis.intents[0].intent == "GetPayments")
                     {
-                        var account = _accRepository.SingleOrDefault(x => x.AccountId == luis.entities[0].entity);
-                        
-                        //var stateClient = message.GetStateClient();
-                        //var userData = await stateClient.BotState.GetUserDataAsync(message.ChannelId, message.From.Id);
-                        //userData.SetProperty("Data", account);
-                        //await stateClient.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
+                        if (luis.entities.Length > 0)
+                        {
 
-                        var msg =
-                            message.CreateReply(
-                                $"The intent is {luis.intents[0].intent} and entity is {luis.entities[0].entity}");
-                        
-                        msg.Attachments = new List<Attachment>();
-                        msg.Attachments.Add(new Attachment("json", "", account));
-                        await connector.Conversations.SendToConversationAsync(msg);
+                            //var stateClient = message.GetStateClient();
+                            //var userData = await stateClient.BotState.GetUserDataAsync(message.ChannelId, message.From.Id);
+                            //userData.SetProperty("Data", account);
+                            //await stateClient.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
+                            var payments = _txRepository.Where(x => x.AccountId == luis.entities[0].entity).ToList();
+                            var msg =
+                                message.CreateReply(
+                                    $"The intent is {luis.intents[0].intent} and entity is {luis.entities[0].entity}");
+                            msg.Attachments = new List<Attachment>();
+                            msg.Attachments.Add(new Attachment("application/json", "", payments));
 
+                            await connector.Conversations.SendToConversationAsync(msg);
+                        }
+                        else
+                        {
+                            var msg = message.CreateReply("Transaction not found");
+                            await connector.Conversations.SendToConversationAsync(msg);
+                        }
                     }
                     if (luis.intents[0].intent == "AddPayment")
                     {
@@ -105,13 +119,13 @@ namespace IBot.Web
                 {
                     await connector.Conversations.SendToConversationAsync(HandleSystemMessage(message));
                 }
-                return null;
+                
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, "An error has occured");
                 //throw;
-                return null;
+                
             }
         }
 

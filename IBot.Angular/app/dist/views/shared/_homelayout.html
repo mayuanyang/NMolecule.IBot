@@ -22,7 +22,12 @@
 
 
 <div class="container">
-    	<dynamic-template data="model.dynamicContent" name="Hello"></dynamic-template>
-		<dynamic-template data="model.listData" name="List Data"></dynamic-template>
-    	<dynamic-template data="model.botData" name="Bot Data"></dynamic-template>
+    <dynamic-template data="model.dynamicContent" name="Hello"></dynamic-template>
+    <dynamic-template data="model.listData" name="List Data"></dynamic-template>
+    <dynamic-template data="model.botData" name="Bot Data"></dynamic-template>
+</div>
+<div class="container-fluid">
+    <input type="text" ng-model="model.message"/>
+    <button ng-click="model.postMessage()">Send</button>
+    <button ng-click="model.getMessages()">Send</button>
 </div>
