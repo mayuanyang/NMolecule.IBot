@@ -3,7 +3,7 @@ using Microsoft.Bot.Connector;
 
 namespace IBot.Core
 {
-    public interface IMessageProcessEngine
+    public interface ILuisProcessEngine
     {
         Task<Luis> ProcessMessage(Activity message);
     }

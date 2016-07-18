@@ -12,7 +12,7 @@ namespace IBot.Core
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-            builder.RegisterType<MessageProcessEngine>().AsImplementedInterfaces().InstancePerLifetimeScope();
+            builder.RegisterType<LuisProcessEngine>().AsImplementedInterfaces().InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(InMemoryRepository<>)).AsImplementedInterfaces().SingleInstance();
 
             builder.Register<ILogger>((c, p) => new LoggerConfiguration()

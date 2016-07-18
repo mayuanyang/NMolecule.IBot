@@ -12,12 +12,11 @@ import angularchart from './angular-chart.js';
 import uiboot from './ui-bootstrap-tpls';
 import homeLayoutController from './homeLayoutController';
 
-
-import quotePartPinbanInfo from './quotePartPinbanInfo';
 import dynamicTemplate from './dynamicTemplate';
+import loadDirective from './loadDirective';
 
 console.log("version: " + angular.version.full);
-var myApp = angular.module('myApp', ['ui.router', 'cgBusy', 'duScroll','quotePartPinbanInfoDirective', 'toggle-switch','chart.js','ui.bootstrap', 'dynamicTemplateDirective'])
+var myApp = angular.module('myApp', ['ui.router', 'cgBusy', 'duScroll', 'toggle-switch','ui.bootstrap', 'dynamicTemplateDirective', 'loadDynamicTemplateDirective'])
 	.controller('homeLayoutController', homeLayoutController)
 	.factory('guidFactory', guidFactory.createFactory)
 	.service('httpService', httpService);

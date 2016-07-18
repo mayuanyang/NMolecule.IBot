@@ -10,8 +10,8 @@ var $__traceur_45_runtime__,
     $__angular_45_chart_46_js__,
     $__ui_45_bootstrap_45_tpls__,
     $__homeLayoutController__,
-    $__quotePartPinbanInfo__,
-    $__dynamicTemplate__;
+    $__dynamicTemplate__,
+    $__loadDirective__;
 var traceur = ($__traceur_45_runtime__ = require("./traceur-runtime"), $__traceur_45_runtime__ && $__traceur_45_runtime__.__esModule && $__traceur_45_runtime__ || {default: $__traceur_45_runtime__}).default;
 var router = ($__angular_45_ui_45_router__ = require("./angular-ui-router"), $__angular_45_ui_45_router__ && $__angular_45_ui_45_router__.__esModule && $__angular_45_ui_45_router__ || {default: $__angular_45_ui_45_router__}).default;
 var angularBusy = ($__angular_45_busy__ = require("./angular-busy"), $__angular_45_busy__ && $__angular_45_busy__.__esModule && $__angular_45_busy__ || {default: $__angular_45_busy__}).default;
@@ -23,10 +23,10 @@ var chart = ($__chart_46_js__ = require("./chart.js"), $__chart_46_js__ && $__ch
 var angularchart = ($__angular_45_chart_46_js__ = require("./angular-chart.js"), $__angular_45_chart_46_js__ && $__angular_45_chart_46_js__.__esModule && $__angular_45_chart_46_js__ || {default: $__angular_45_chart_46_js__}).default;
 var uiboot = ($__ui_45_bootstrap_45_tpls__ = require("./ui-bootstrap-tpls"), $__ui_45_bootstrap_45_tpls__ && $__ui_45_bootstrap_45_tpls__.__esModule && $__ui_45_bootstrap_45_tpls__ || {default: $__ui_45_bootstrap_45_tpls__}).default;
 var homeLayoutController = ($__homeLayoutController__ = require("./homeLayoutController"), $__homeLayoutController__ && $__homeLayoutController__.__esModule && $__homeLayoutController__ || {default: $__homeLayoutController__}).default;
-var quotePartPinbanInfo = ($__quotePartPinbanInfo__ = require("./quotePartPinbanInfo"), $__quotePartPinbanInfo__ && $__quotePartPinbanInfo__.__esModule && $__quotePartPinbanInfo__ || {default: $__quotePartPinbanInfo__}).default;
 var dynamicTemplate = ($__dynamicTemplate__ = require("./dynamicTemplate"), $__dynamicTemplate__ && $__dynamicTemplate__.__esModule && $__dynamicTemplate__ || {default: $__dynamicTemplate__}).default;
+var loadDirective = ($__loadDirective__ = require("./loadDirective"), $__loadDirective__ && $__loadDirective__.__esModule && $__loadDirective__ || {default: $__loadDirective__}).default;
 console.log("version: " + angular.version.full);
-var myApp = angular.module('myApp', ['ui.router', 'cgBusy', 'duScroll', 'quotePartPinbanInfoDirective', 'toggle-switch', 'chart.js', 'ui.bootstrap', 'dynamicTemplateDirective']).controller('homeLayoutController', homeLayoutController).factory('guidFactory', guidFactory.createFactory).service('httpService', httpService);
+var myApp = angular.module('myApp', ['ui.router', 'cgBusy', 'duScroll', 'toggle-switch', 'ui.bootstrap', 'dynamicTemplateDirective', 'loadDynamicTemplateDirective']).controller('homeLayoutController', homeLayoutController).factory('guidFactory', guidFactory.createFactory).service('httpService', httpService);
 myApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider) {
   $urlRouterProvider.otherwise("/");
   $httpProvider.defaults.withCredentials = false;

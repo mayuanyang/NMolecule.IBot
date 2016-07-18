@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace IBot.Core
 {
-    public class MessageProcessEngine : IMessageProcessEngine
+    public class LuisProcessEngine : ILuisProcessEngine
     {
         public async Task<Luis> ProcessMessage(Activity message)
         {

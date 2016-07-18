@@ -117,9 +117,9 @@
     <Compile Include="IBotCoreModule.cs" />
     <Compile Include="Repositories\InMemoryRepository.cs" />
     <Compile Include="Repositories\IRepository.cs" />
-    <Compile Include="Services\IMessageProcessEngine.cs" />
+    <Compile Include="Services\ILuisProcessEngine.cs" />
     <Compile Include="Luis.cs" />
-    <Compile Include="Services\MessageProcessEngine.cs" />
+    <Compile Include="Services\LuisProcessEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

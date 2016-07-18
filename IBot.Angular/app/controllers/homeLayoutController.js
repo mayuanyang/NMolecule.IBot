@@ -1,23 +1,11 @@
 ﻿
 export default class homeLayoutController{
-    constructor($http, $stateParams, $filter, httpService) {
+    constructor($http, $stateParams, $filter, httpService, $interval) {
         this.$http = $http;
-        this.$http.defaults.headers.common.Authorization = 'BotConnector QY4G9TbtvQk.cwA.v7Q.-usmccAmSfOTnTzmRsYovejZYYkI-dq1tb1Y_wCgFAQ' ;
+		this.$interval = $interval;
+		this.$http.defaults.headers.common.Authorization = 'BotConnector kaPcdAksQ_M.cwA.jQk.K-BStvNcDBLqbWrjRLGoo4pvsn1hlmpyO6PfxunmPY8' ;
         this.message = '';
-        this.dynamicContent = {
-    
-            "name String" : "eddy",
-            "gender String" : "male",
-            "age String" : "35",
-            "thing Object" : { "firstName" : "yuan", "lastName" : "ma"},
-            "array Only" : ["aa", "bb", "cc"],
-            "schema":[
-              {"data_type":"string", "display_name":"MyField123"},
-              {"data_type":"file", "display_name":"MyField456"},
-              {"data_type":"checkbox", "display_name":"MyField789"}
-            ]
-        };
-
+        
         this.showDemoData();
 
         this.getRequestToken()
@@ -29,78 +17,79 @@ export default class homeLayoutController{
         this.startConversation()
             .success(data => {
                 this.conversationId = data.conversationId;
-                console.log(data);
+                this.getMessages();
             });
-
-    } 
+		
+		
+    }
 	
     getRequestToken() {
-     
-        return this.$http.get('https://directline.botframework.com/api/tokens');
+             return this.$http.get('https://directline.botframework.com/api/tokens');
     }
 
     startConversation() {
         return this.$http.post('https://directline.botframework.com/api/conversations', '');
-        
     }
 
     postMessage() {
-        //return this.$http.post('https://directline.botframework.com/api/conversations/'+ this.conversationId + '/messages', 'hello');
         return this.$http({
             method: 'POST',
             url: 'https://directline.botframework.com/api/conversations/'+ this.conversationId + '/messages',
             
-            data: { message: this.message }
+            data: { message: {
+                "id": "string",
+                "conversationId": this.conversationId,
+                "created": "2016-07-17T11:02:01.374Z",
+                "from": "test",
+                "text": "get account for 46012345678",
+                "channelData": {},
+                "images": [],
+                "attachments": [],
+                "eTag": ""
+            } }
         });
     }
 
     getMessages() {
-        this.$http.get('https://directline.botframework.com/api/conversations/' + this.conversationId + '/messages')
+		var self = this;
+		var var_1=this.$interval(function(){
+			self.$http.get('https://directline.botframework.com/api/conversations/' + self.conversationId + '/messages')
             .success(data => {
-                alert(data);
+                console.log(data);
             });
-
+		},5000);
     }
 
     showDemoData() {
-        this.listData = ["aaaa", "bbbb"];
-  
-        this.botData={
-            "conversationId": "8a684db8",
-            "language": "en-US",
-            "text": "The intent is GetPayments and entity is 46012345678",
-            "from": {
-                "name": "1b3e574b-8aab-437c-a7d9-5f8b52469c02",
-                "channelId": "emulator",
-                "address": "1b3e574b-8aab-437c-a7d9-5f8b52469c02",
-                "isBot": true
-            },
-            "to": {
-                "name": "User1",
-                "channelId": "emulator",
-                "address": "User1",
-                "isBot": false
-            },
-            "replyToMessageId": "707b21130a8b4efc8ac5ecebbd2c7e9a",
-            "participants": [
-              {
-                  "name": "User1",
-                  "channelId": "emulator",
-                  "address": "User1"
-              },
-              {
-                  "name": "1b3e574b-8aab-437c-a7d9-5f8b52469c02",
-                  "channelId": "emulator",
-                  "address": "1b3e574b-8aab-437c-a7d9-5f8b52469c02"
-              }
-            ],
-            "totalParticipants": 2,
-            "channelMessageId": "3324b56fa694458e950a75e89ef178d1",
-            "channelConversationId": "Conv1"
-        };
+		this.models = [];
+		
+        var dynamicContent = {
+			data: {
+				"name String" : "eddy",
+				"gender String" : "male",
+				"age String" : "35",
+				"thing Object" : { "firstName" : "yuan", "lastName" : "ma"},
+				"array Only" : ["aa", "bb", "cc"],
+				"schema":[
+				  {"data_type":"string", "display_name":"MyField123"},
+				  {"data_type":"file", "display_name":"MyField456"},
+				  {"data_type":"checkbox", "display_name":"MyField789"}
+				]
+			},
+			name: "test"
+		};
+		
+		var listData = {
+		data: ['aaa', 'bbb'],
+		name: "list data"
+		};
+		
+		this.models.push(dynamicContent);
+		this.models.push(listData);
+	
     }
 	
 	
 };
 
-homeLayoutController.$inject = ['$http', '$stateParams', '$filter', 'httpService'];
+homeLayoutController.$inject = ['$http', '$stateParams', '$filter', 'httpService', '$interval'];

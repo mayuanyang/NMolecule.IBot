@@ -12,7 +12,6 @@ angular.module('dynamicTemplateDirective', []).directive('dynamicTemplate', ['$c
     var field_inputs = "";
     var myData = scope.data;
     var headerName = scope.name;
-    console.log(headerName);
     var new_field = '';
     var panelOpenTag = " <div class='panel panel-primary' class='expandable'><div class='panel-heading'>" + scope.name + "</div><div class='panel-body'>";
     var panelCloseTag = "</div></div></div>";
@@ -37,7 +36,6 @@ angular.module('dynamicTemplateDirective', []).directive('dynamicTemplate', ['$c
                 var objItem = list[item];
                 contentRow = "<tr>" + contentRow;
                 for (var f in objItem) {
-                  console.log("inner table " + f);
                   if (loop === 0)
                     headerContent += "<th class='text-capitalize'>" + f + "</th>";
                   contentRow += "<td>" + objItem[f] + "</td>";

@@ -22,12 +22,15 @@
 
 
 <div class="container">
-    <dynamic-template data="model.dynamicContent" name="Hello"></dynamic-template>
-    <dynamic-template data="model.listData" name="List Data"></dynamic-template>
-    <dynamic-template data="model.botData" name="Bot Data"></dynamic-template>
+   <load-directive models="model.models"> </load-directive>
 </div>
 <div class="container-fluid">
-    <input type="text" ng-model="model.message"/>
-    <button ng-click="model.postMessage()">Send</button>
-    <button ng-click="model.getMessages()">Send</button>
+<div class="input-group">
+ 
+      <input type="text" class="form-control" placeholder="Message..." ng-model="model.message">
+	  <span class="input-group-btn">
+        <button class="btn btn-default" type="button" ng-click="model.postMessage()">Send</button>
+      </span>
+</div>
+    
 </div>
