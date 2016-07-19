@@ -11,7 +11,8 @@ var $__traceur_45_runtime__,
     $__ui_45_bootstrap_45_tpls__,
     $__homeLayoutController__,
     $__dynamicTemplate__,
-    $__loadDirective__;
+    $__loadDirective__,
+    $__enterPress__;
 var traceur = ($__traceur_45_runtime__ = require("./traceur-runtime"), $__traceur_45_runtime__ && $__traceur_45_runtime__.__esModule && $__traceur_45_runtime__ || {default: $__traceur_45_runtime__}).default;
 var router = ($__angular_45_ui_45_router__ = require("./angular-ui-router"), $__angular_45_ui_45_router__ && $__angular_45_ui_45_router__.__esModule && $__angular_45_ui_45_router__ || {default: $__angular_45_ui_45_router__}).default;
 var angularBusy = ($__angular_45_busy__ = require("./angular-busy"), $__angular_45_busy__ && $__angular_45_busy__.__esModule && $__angular_45_busy__ || {default: $__angular_45_busy__}).default;
@@ -25,8 +26,9 @@ var uiboot = ($__ui_45_bootstrap_45_tpls__ = require("./ui-bootstrap-tpls"), $__
 var homeLayoutController = ($__homeLayoutController__ = require("./homeLayoutController"), $__homeLayoutController__ && $__homeLayoutController__.__esModule && $__homeLayoutController__ || {default: $__homeLayoutController__}).default;
 var dynamicTemplate = ($__dynamicTemplate__ = require("./dynamicTemplate"), $__dynamicTemplate__ && $__dynamicTemplate__.__esModule && $__dynamicTemplate__ || {default: $__dynamicTemplate__}).default;
 var loadDirective = ($__loadDirective__ = require("./loadDirective"), $__loadDirective__ && $__loadDirective__.__esModule && $__loadDirective__ || {default: $__loadDirective__}).default;
+var enterPress = ($__enterPress__ = require("./enterPress"), $__enterPress__ && $__enterPress__.__esModule && $__enterPress__ || {default: $__enterPress__}).default;
 console.log("version: " + angular.version.full);
-var myApp = angular.module('myApp', ['ui.router', 'cgBusy', 'duScroll', 'toggle-switch', 'ui.bootstrap', 'dynamicTemplateDirective', 'loadDynamicTemplateDirective']).controller('homeLayoutController', homeLayoutController).factory('guidFactory', guidFactory.createFactory).service('httpService', httpService);
+var myApp = angular.module('myApp', ['ui.router', 'cgBusy', 'duScroll', 'toggle-switch', 'ui.bootstrap', 'dynamicTemplateDirective', 'loadDynamicTemplateDirective', 'enterPressDirective']).controller('homeLayoutController', homeLayoutController).factory('guidFactory', guidFactory.createFactory).service('httpService', httpService);
 myApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider) {
   $urlRouterProvider.otherwise("/");
   $httpProvider.defaults.withCredentials = false;

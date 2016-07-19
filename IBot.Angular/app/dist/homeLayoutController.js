@@ -6,6 +6,8 @@ var homeLayoutController = function() {
     this.$interval = $interval;
     this.$http.defaults.headers.common.Authorization = 'BotConnector kaPcdAksQ_M.cwA.jQk.K-BStvNcDBLqbWrjRLGoo4pvsn1hlmpyO6PfxunmPY8';
     this.message = '';
+    this.messages = [];
+    this.models = [];
     this.showDemoData();
     this.getRequestToken().success(function(data) {
       $__5.token = data;
@@ -23,7 +25,8 @@ var homeLayoutController = function() {
       return this.$http.post('https://directline.botframework.com/api/conversations', '');
     },
     postMessage: function() {
-      return this.$http({
+      var $__5 = this;
+      this.$http({
         method: 'POST',
         url: 'https://directline.botframework.com/api/conversations/' + this.conversationId + '/messages',
         data: {message: {
@@ -31,24 +34,35 @@ var homeLayoutController = function() {
             "conversationId": this.conversationId,
             "created": "2016-07-17T11:02:01.374Z",
             "from": "test",
-            "text": "get account for 46012345678",
+            "text": this.message,
             "channelData": {},
             "images": [],
             "attachments": [],
             "eTag": ""
           }}
+      }).success(function(data) {
+        $__5.message = '';
       });
     },
     getMessages: function() {
       var self = this;
       var var_1 = this.$interval(function() {
         self.$http.get('https://directline.botframework.com/api/conversations/' + self.conversationId + '/messages').success(function(data) {
-          console.log(data);
+          for (var i in data.messages) {
+            var msg = data[i];
+            if (msg) {
+              self.messages.push(msg.text);
+              var result = {
+                data: msg,
+                name: msg.text
+              };
+              self.models.push(result);
+            }
+          }
         });
       }, 5000);
     },
     showDemoData: function() {
-      this.models = [];
       var dynamicContent = {
         data: {
           "name String": "eddy",

@@ -5,8 +5,9 @@ export default class homeLayoutController{
 		this.$interval = $interval;
 		this.$http.defaults.headers.common.Authorization = 'BotConnector kaPcdAksQ_M.cwA.jQk.K-BStvNcDBLqbWrjRLGoo4pvsn1hlmpyO6PfxunmPY8' ;
         this.message = '';
-        
-        this.showDemoData();
+        this.messages = [];
+        this.models = [];
+        //this.showDemoData();
 
         this.getRequestToken()
             .success(data => {
@@ -32,7 +33,7 @@ export default class homeLayoutController{
     }
 
     postMessage() {
-        return this.$http({
+        this.$http({
             method: 'POST',
             url: 'https://directline.botframework.com/api/conversations/'+ this.conversationId + '/messages',
             
@@ -41,27 +42,41 @@ export default class homeLayoutController{
                 "conversationId": this.conversationId,
                 "created": "2016-07-17T11:02:01.374Z",
                 "from": "test",
-                "text": "get account for 46012345678",
+                "text": this.message,
                 "channelData": {},
                 "images": [],
                 "attachments": [],
                 "eTag": ""
             } }
+        }).success(data => {
+            this.message = '';
         });
     }
 
     getMessages() {
 		var self = this;
-		var var_1=this.$interval(function(){
-			self.$http.get('https://directline.botframework.com/api/conversations/' + self.conversationId + '/messages')
-            .success(data => {
-                console.log(data);
-            });
+		var var_1=this.$interval(function() {
+		    self.$http.get('https://directline.botframework.com/api/conversations/' + self.conversationId + '/messages')
+		        .success(data => {
+		            for (var i in data.messages) {
+		                var msg = data[i];
+		                if (msg) {
+		                    self.messages.push(msg.text);
+		                    var result = {
+		                        data: msg,
+		                        name: msg.text
+		                    };
+		                    self.models.push(result);
+		                }
+		            }
+
+
+		        });
 		},5000);
     }
 
     showDemoData() {
-		this.models = [];
+		
 		
         var dynamicContent = {
 			data: {

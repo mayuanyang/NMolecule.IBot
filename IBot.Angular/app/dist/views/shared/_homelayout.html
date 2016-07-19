@@ -13,24 +13,26 @@
             <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
                 <ul class="nav navbar-nav">
                     <li class="active"></li>
-                    
+
                 </ul>
             </div>
         </div>
     </nav>
 </div>
 
+   <div id="main" class="container">
+       <load-directive models="model.models"></load-directive>
+    </div>
 
-<div class="container">
-   <load-directive models="model.models"> </load-directive>
-</div>
+
 <div class="container-fluid">
-<div class="input-group">
- 
-      <input type="text" class="form-control" placeholder="Message..." ng-model="model.message">
-	  <span class="input-group-btn">
-        <button class="btn btn-default" type="button" ng-click="model.postMessage()">Send</button>
-      </span>
+
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Message..." ng-model="model.message" enter-press="model.postMessage()">
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="button" ng-click="model.postMessage()">Send</button>
+        </span>
+    </div>
 </div>
-    
-</div>
+
+

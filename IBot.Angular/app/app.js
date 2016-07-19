@@ -14,9 +14,10 @@ import homeLayoutController from './homeLayoutController';
 
 import dynamicTemplate from './dynamicTemplate';
 import loadDirective from './loadDirective';
+import enterPress from './enterPress';
 
 console.log("version: " + angular.version.full);
-var myApp = angular.module('myApp', ['ui.router', 'cgBusy', 'duScroll', 'toggle-switch','ui.bootstrap', 'dynamicTemplateDirective', 'loadDynamicTemplateDirective'])
+var myApp = angular.module('myApp', ['ui.router', 'cgBusy', 'duScroll', 'toggle-switch','ui.bootstrap', 'dynamicTemplateDirective', 'loadDynamicTemplateDirective', 'enterPressDirective'])
 	.controller('homeLayoutController', homeLayoutController)
 	.factory('guidFactory', guidFactory.createFactory)
 	.service('httpService', httpService);
