@@ -25,11 +25,13 @@ export default class homeLayoutController{
     }
 	
     getRequestToken() {
+		
              return this.$http.get('https://directline.botframework.com/api/tokens');
     }
 
     startConversation() {
-        return this.$http.post('https://directline.botframework.com/api/conversations', '');
+		
+        return this.$http.post('https://directline.botframework.com/api/conversations');
     }
 
     postMessage() {
@@ -37,17 +39,9 @@ export default class homeLayoutController{
             method: 'POST',
             url: 'https://directline.botframework.com/api/conversations/'+ this.conversationId + '/messages',
             
-            data: { message: {
-                "id": "string",
-                "conversationId": this.conversationId,
-                "created": "2016-07-17T11:02:01.374Z",
-                "from": "test",
-                "text": this.message,
-                "channelData": {},
-                "images": [],
-                "attachments": [],
-                "eTag": ""
-            } }
+            data: { 
+                "text": this.message
+            } 
         }).success(data => {
             this.message = '';
         });
@@ -58,15 +52,18 @@ export default class homeLayoutController{
 		var var_1=this.$interval(function() {
 		    self.$http.get('https://directline.botframework.com/api/conversations/' + self.conversationId + '/messages')
 		        .success(data => {
-		            for (var i in data.messages) {
-		                var msg = data[i];
+		            for(var i in data.messages) {
+		                console.log(i);
+		                var msg = data.messages[i];
+		                console.log(msg);
 		                if (msg) {
 		                    self.messages.push(msg.text);
 		                    var result = {
-		                        data: msg,
+		                        data: msg.attachments[0],
 		                        name: msg.text
 		                    };
 		                    self.models.push(result);
+		                    console.log('message added');
 		                }
 		            }
 

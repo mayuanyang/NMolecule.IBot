@@ -1,20 +1,19 @@
 "use strict";
 var homeLayoutController = function() {
   function homeLayoutController($http, $stateParams, $filter, httpService, $interval) {
-    var $__5 = this;
+    var $__3 = this;
     this.$http = $http;
     this.$interval = $interval;
     this.$http.defaults.headers.common.Authorization = 'BotConnector kaPcdAksQ_M.cwA.jQk.K-BStvNcDBLqbWrjRLGoo4pvsn1hlmpyO6PfxunmPY8';
     this.message = '';
     this.messages = [];
     this.models = [];
-    this.showDemoData();
     this.getRequestToken().success(function(data) {
-      $__5.token = data;
+      $__3.token = data;
     });
     this.startConversation().success(function(data) {
-      $__5.conversationId = data.conversationId;
-      $__5.getMessages();
+      $__3.conversationId = data.conversationId;
+      $__3.getMessages();
     });
   }
   return ($traceurRuntime.createClass)(homeLayoutController, {
@@ -22,26 +21,16 @@ var homeLayoutController = function() {
       return this.$http.get('https://directline.botframework.com/api/tokens');
     },
     startConversation: function() {
-      return this.$http.post('https://directline.botframework.com/api/conversations', '');
+      return this.$http.post('https://directline.botframework.com/api/conversations');
     },
     postMessage: function() {
-      var $__5 = this;
+      var $__3 = this;
       this.$http({
         method: 'POST',
         url: 'https://directline.botframework.com/api/conversations/' + this.conversationId + '/messages',
-        data: {message: {
-            "id": "string",
-            "conversationId": this.conversationId,
-            "created": "2016-07-17T11:02:01.374Z",
-            "from": "test",
-            "text": this.message,
-            "channelData": {},
-            "images": [],
-            "attachments": [],
-            "eTag": ""
-          }}
+        data: {"text": this.message}
       }).success(function(data) {
-        $__5.message = '';
+        $__3.message = '';
       });
     },
     getMessages: function() {
@@ -49,14 +38,17 @@ var homeLayoutController = function() {
       var var_1 = this.$interval(function() {
         self.$http.get('https://directline.botframework.com/api/conversations/' + self.conversationId + '/messages').success(function(data) {
           for (var i in data.messages) {
-            var msg = data[i];
+            console.log(i);
+            var msg = data.messages[i];
+            console.log(msg);
             if (msg) {
               self.messages.push(msg.text);
               var result = {
-                data: msg,
+                data: msg.attachments[0],
                 name: msg.text
               };
               self.models.push(result);
+              console.log('message added');
             }
           }
         });
