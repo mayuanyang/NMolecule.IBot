@@ -7,6 +7,9 @@ export default class homeLayoutController{
         this.message = '';
         this.messages = [];
         this.models = [];
+        this.watermark = 0;
+        this.getRequestCounter = 0;
+        this.receivedMessageIds = [];
         //this.showDemoData();
 
         this.getRequestToken()
@@ -44,32 +47,42 @@ export default class homeLayoutController{
             } 
         }).success(data => {
             this.message = '';
+            this.getRequestCounter = 0;
         });
     }
 
     getMessages() {
 		var self = this;
 		var var_1=this.$interval(function() {
-		    self.$http.get('https://directline.botframework.com/api/conversations/' + self.conversationId + '/messages')
+		    self.$http.get('https://directline.botframework.com/api/conversations/' + self.conversationId + '/messages?watermark=' + self.watermark)
 		        .success(data => {
 		            for(var i in data.messages) {
 		                console.log(i);
 		                var msg = data.messages[i];
-		                console.log(msg);
-		                if (msg) {
+		                //console.log(msg);
+		                if (self.receivedMessageIds.indexOf(msg.id) == -1) {
+		                    self.receivedMessageIds.push(msg.id);
 		                    self.messages.push(msg.text);
-		                    var result = {
-		                        data: msg.attachments[0],
-		                        name: msg.text
-		                    };
-		                    self.models.push(result);
-		                    console.log('message added');
+		                    if (msg.channelData) {
+		                    
+		                        var result = {
+		                            data: msg.channelData,
+		                            name: msg.text
+		                        };
+		                        self.models.push(result);
+		                        console.log('message added');
+		                    }
 		                }
+		                
 		            }
-
-
+		            self.getRequestCounter += 1;
+                    if (self.getRequestCounter === 10) {
+                        self.watermark += 1;
+                        self.getRequestCounter = 0;
+                    }
+		            
 		        });
-		},5000);
+		},2000);
     }
 
     showDemoData() {
