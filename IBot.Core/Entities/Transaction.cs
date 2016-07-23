@@ -7,9 +7,9 @@ namespace IBot.Core.Entities
     {
         public Guid TransactionId { get; set; }
         public decimal Amount { get; set; }
-        public PaymentProcessor PaymentProcessor { get; set; }
-        public TransactionType TransactionType { get; set; }
-        public TransactionStatus TransactionStatus { get; set; }
+        public string PaymentProcessor { get; set; }
+        public string TransactionType { get; set; }
+        public string TransactionStatus { get; set; }
         public string AccountId { get; set; }
     }
 }

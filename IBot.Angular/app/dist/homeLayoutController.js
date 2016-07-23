@@ -67,7 +67,6 @@ var homeLayoutController = function() {
           }
           self.getRequestCounter += 1;
           if (self.getRequestCounter === 10) {
-            self.watermark += 1;
             self.getRequestCounter = 0;
           }
         });

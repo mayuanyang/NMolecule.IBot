@@ -49,10 +49,10 @@ namespace IBot.Web
                         {
                             AccountId = acc.AccountId,
                             Amount = new Random(j).Next(200),
-                            PaymentProcessor = (PaymentProcessor)new Random(j).Next(3),
+                            PaymentProcessor = ((PaymentProcessor)new Random(j).Next(3)).ToString(),
                             TransactionId = Guid.NewGuid(),
-                            TransactionStatus = (TransactionStatus)new Random(j).Next(2),
-                            TransactionType = (TransactionType)new Random(j).Next(1)
+                            TransactionStatus = ((TransactionStatus)new Random(j).Next(2)).ToString(),
+                            TransactionType = ((TransactionType)new Random(j).Next(1)).ToString()
                         };
                         _txRepository.Add(tx);
                     }
@@ -87,8 +87,9 @@ namespace IBot.Web
                     {
                         if (luis.entities.Length > 0)
                         {
-                            var reply = activity.CreateReply($"You typed: {activity.Text}    Reply: Here is your account information");
-                            var account = _accRepository.SingleOrDefault(x => x.AccountId == luis.entities[0].entity);
+                            var ual = luis.entities.FirstOrDefault(x => x.type.ToUpper() == "UAL");
+                            var reply = activity.CreateReply($"Here is your account information");
+                            var account = _accRepository.SingleOrDefault(x => x.AccountId == ual.entity);
                             if (activity.ChannelId == "slack")
                             {
                                 reply.ChannelData = await _slaceChannelDataService.GenerateChannelSpecificData(reply, account);
@@ -105,7 +106,7 @@ namespace IBot.Web
                         }
                         else
                         {
-                            await connector.Conversations.SendToConversationAsync(activity.CreateReply($"You typed: {activity.Text}    Reply: Sorry, we cannot find the account by the given account Id"));
+                            await connector.Conversations.SendToConversationAsync(activity.CreateReply($"Sorry, we cannot find the account by the given account Id"));
                         }
                         
                     }
@@ -113,15 +114,65 @@ namespace IBot.Web
                     {
                         if (luis.entities.Length > 0)
                         {
-                            
+                            var ual = luis.entities.FirstOrDefault(x => x.type.ToUpper() == "UAL");
+                            var paymentProcessor = luis.entities.FirstOrDefault(x => x.type.ToUpper().IndexOf("PAYMENTPROCESSOR") > -1 );
+                            var transactionType = luis.entities.FirstOrDefault(x => x.type.ToUpper().IndexOf("TRANSACTIONTYPE") > -1 );
+
                             //var stateClient = message.GetStateClient();
                             //var userData = await stateClient.BotState.GetUserDataAsync(message.ChannelId, message.From.Id);
                             //userData.SetProperty("Data", account);
                             //await stateClient.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
-                            var payments = _txRepository.Where(x => x.AccountId == luis.entities[0].entity).ToList();
+                            IEnumerable<Transaction> payments = null;
+                            if (ual == null)
+                            {
+                                var a = activity.CreateReply($"I don't understand what you are after, please at least provide a Ual");
+                                await connector.Conversations.SendToConversationAsync(a);
+                                return;
+                            }
+                            if (paymentProcessor != null && transactionType != null)
+                            {
+                                var actualPaymentProcessor = PaymentProcessor.AusPost;
+                                if (paymentProcessor.entity.ToUpper().Contains("BPAY"))
+                                {
+                                    actualPaymentProcessor = PaymentProcessor.BPay;
+                                }
+                                else if (paymentProcessor.entity.ToUpper().Contains("AUSPOST") ||
+                                         paymentProcessor.entity.ToUpper().Contains("AUSTRALIA POST"))
+                                {
+                                    actualPaymentProcessor = PaymentProcessor.AusPost;
+                                }
+                                else if (paymentProcessor.entity.ToUpper().Contains("CREDIT"))
+                                {
+                                    actualPaymentProcessor = PaymentProcessor.CreditCard;
+                                }
+                                else if (paymentProcessor.entity.ToUpper().Contains("BANKSTATEMENT") ||
+                                         paymentProcessor.entity.ToUpper().Contains("BANK STATEMENT"))
+                                {
+                                    actualPaymentProcessor = PaymentProcessor.BankStatement;
+                                }
+                                else if (paymentProcessor.entity.ToUpper().Contains("DEBIT"))
+                                {
+                                    actualPaymentProcessor = PaymentProcessor.DirectDebit;
+                                }
+                                else if (paymentProcessor.entity.ToUpper().Contains("MANUAL"))
+                                {
+                                    actualPaymentProcessor = PaymentProcessor.ManualPayment;
+                                }
+
+
+                                payments =
+                                    _txRepository.Where(
+                                        x => x.AccountId == ual.entity && x.PaymentProcessor == actualPaymentProcessor.ToString())
+                                        .ToList();
+                            }
+                            else
+                            {
+                                payments = _txRepository.Where(x => x.AccountId == ual.entity).ToList();
+                            }
+                            
                             var reply =
                                 activity.CreateReply(
-                                    $"You typed: {activity.Text}    Reply: Here is the payments information");
+                                    $"Here is the payments information");
 
                             if (activity.ChannelId == "slack")
                             {
@@ -136,7 +187,7 @@ namespace IBot.Web
                         }
                         else
                         {
-                            var reply = activity.CreateReply($"You typed: {activity.Text}    Reply: I don't understand what you are after, please at least provide a Ual");
+                            var reply = activity.CreateReply($"I don't understand what you are after, please at least provide a Ual");
                             await connector.Conversations.SendToConversationAsync(reply);
                         }
                     }
@@ -146,7 +197,7 @@ namespace IBot.Web
                     }
                     if(luis.intents[0].intent == "SendRecReport")
                     {
-                        await connector.Conversations.SendToConversationAsync(activity.CreateReply($"You typed: {activity.Text}    Reply: I will send you the report shortly to your email"));
+                        await connector.Conversations.SendToConversationAsync(activity.CreateReply($"I will send you the report shortly to your email"));
                     }
                   
                 }

@@ -89,7 +89,6 @@ export default class homeLayoutController{
 		            }
 		            self.getRequestCounter += 1;
                     if (self.getRequestCounter === 10) {
-                        self.watermark += 1;
                         self.getRequestCounter = 0;
                     }
 		            
