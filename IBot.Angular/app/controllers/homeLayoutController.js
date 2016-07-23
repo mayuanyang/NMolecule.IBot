@@ -9,7 +9,7 @@ export default class homeLayoutController{
         this.models = [];
         this.watermark = 0;
         this.getRequestCounter = 0;
-        this.from = '';
+        this.botName = 'd5d2748d-ea5c-4cec-8cc3-1c3fcf8ba2fd';
         this.receivedMessageIds = [];
         this.isRetrivalStart = false;
         //this.showDemoData();
@@ -47,13 +47,13 @@ export default class homeLayoutController{
             data: { 
                 "text": this.message
             } 
-        }).success(data => {
+        }).then(data => {
             this.getRequestCounter = 0;
-            this.message = '';
             if (!this.isRetrivalStart) {
                 this.getMessages();
             }
         });
+        this.message = '';
     }
 
     getMessages() {
@@ -62,13 +62,8 @@ export default class homeLayoutController{
 		    self.$http.get('https://directline.botframework.com/api/conversations/' + self.conversationId + '/messages?watermark=' + self.watermark)
 		        .success(data => {
 		            for(var i in data.messages) {
-		                //console.log(i);
 		                var msg = data.messages[i];
-                        if (self.from === '') {
-                            self.from = msg.from;
-                        }
-		                
-		                console.log(msg);
+                        //console.log(msg);
 		                if (self.receivedMessageIds.indexOf(msg.id) == -1) {
 		                    self.receivedMessageIds.push(msg.id);
                             
@@ -83,7 +78,7 @@ export default class homeLayoutController{
 		                        //console.log('message added');
 		                    }
 		                } else {
-		                    console.log('Already handled: ' + msg.id);
+		                    //console.log('Already handled: ' + msg.id);
 		                }
 		                
 		            }

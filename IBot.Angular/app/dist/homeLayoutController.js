@@ -10,7 +10,7 @@ var homeLayoutController = function() {
     this.models = [];
     this.watermark = 0;
     this.getRequestCounter = 0;
-    this.from = '';
+    this.botName = 'd5d2748d-ea5c-4cec-8cc3-1c3fcf8ba2fd';
     this.receivedMessageIds = [];
     this.isRetrivalStart = false;
     this.getRequestToken().success(function(data) {
@@ -33,13 +33,13 @@ var homeLayoutController = function() {
         method: 'POST',
         url: 'https://directline.botframework.com/api/conversations/' + this.conversationId + '/messages',
         data: {"text": this.message}
-      }).success(function(data) {
+      }).then(function(data) {
         $__3.getRequestCounter = 0;
-        $__3.message = '';
         if (!$__3.isRetrivalStart) {
           $__3.getMessages();
         }
       });
+      this.message = '';
     },
     getMessages: function() {
       var self = this;
@@ -47,10 +47,6 @@ var homeLayoutController = function() {
         self.$http.get('https://directline.botframework.com/api/conversations/' + self.conversationId + '/messages?watermark=' + self.watermark).success(function(data) {
           for (var i in data.messages) {
             var msg = data.messages[i];
-            if (self.from === '') {
-              self.from = msg.from;
-            }
-            console.log(msg);
             if (self.receivedMessageIds.indexOf(msg.id) == -1) {
               self.receivedMessageIds.push(msg.id);
               self.messages.push(msg);
@@ -61,9 +57,7 @@ var homeLayoutController = function() {
                 };
                 self.models.push(result);
               }
-            } else {
-              console.log('Already handled: ' + msg.id);
-            }
+            } else {}
           }
           self.getRequestCounter += 1;
           if (self.getRequestCounter === 10) {

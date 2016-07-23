@@ -4,6 +4,7 @@ using System.Web.Http;
 using Autofac;
 using Autofac.Integration.WebApi;
 using IBot.Core;
+using IBot.Core.Services;
 
 namespace IBot.Web
 {
@@ -25,7 +26,9 @@ namespace IBot.Web
             var container = builder.Build();
             container.BeginLifetimeScope();
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
-            
+
+            var sampleDataService = container.Resolve<ISampleDataService>();
+            sampleDataService.Setup();
         }
     }
 }

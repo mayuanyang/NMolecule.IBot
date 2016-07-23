@@ -117,12 +117,17 @@
     <Compile Include="IBotCoreModule.cs" />
     <Compile Include="Repositories\InMemoryRepository.cs" />
     <Compile Include="Repositories\IRepository.cs" />
+    <Compile Include="Services\IAccountService.cs" />
     <Compile Include="Services\IChannelDataService.cs" />
     <Compile Include="Services\ILuisProcessEngine.cs" />
     <Compile Include="Luis.cs" />
+    <Compile Include="Services\ISampleDataService.cs" />
+    <Compile Include="Services\ITransactionService.cs" />
     <Compile Include="Services\LuisProcessEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\SampleDataService.cs" />
     <Compile Include="Services\SlackChannelDataContract.cs" />
+    <Compile Include="Services\TransactionService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

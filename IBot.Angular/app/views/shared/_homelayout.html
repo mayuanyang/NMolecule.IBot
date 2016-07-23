@@ -13,16 +13,16 @@
             <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
                 <ul class="nav navbar-nav">
                     <li class="active"></li>
-                    <li><a href="#myModal" data-backdrop="false" data-toggle="modal">Conversation</a></li>
+                    <li><a href="#myModal" data-backdrop="false" data-toggle="modal">Conversations</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 </div>
 
-   <div id="main" class="container">
-       <load-directive models="model.models"></load-directive>
-    </div>
+<div id="main" class="container">
+    <load-directive models="model.models"></load-directive>
+</div>
 
 
 <div class="container-fluid">
@@ -32,9 +32,9 @@
         <span class="input-group-btn">
             <button class="btn btn-default" type="button" ng-click="model.postMessage()">Send</button>
         </span>
-        
+
     </div>
-    
+
 </div>
 
 <div id="myModal" class="modal fade">
@@ -46,17 +46,21 @@
 
             </div>
             <div class="modal-body">
-                <p ></p>
+                <p></p>
                 <ul class="timeline">
-                    <li ng-repeat="msg in model.messages" ng-class="{'timeline-inverted': msg.from != model.from}">
-                        <div ng-class="{'timeline-badge': true, 'warning': msg.from != model.from, 'success':msg.from == model.from}">
-                            <i class="fa fa-check"></i>
+                    <li ng-repeat="msg in model.messages" ng-class="{'timeline-inverted': msg.from == model.botName}">
+                        <div ng-class="{'timeline-badge': true, 'warning': msg.from == model.botName, 'success':msg.from != model.botName}">
+                            <i class="fa fa-check">
+                                <span ng-if="msg.from == model.botName">bot</span>
+                                    <span ng-if="msg.from != model.botName">you</span>
+                                
+                            </i>
                         </div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
                                 <h4 class="timeline-title">{{msg.text}}</h4>
                                 <p>
-                                    <small class="text-muted"><i class="fa fa-clock-o"></i>{{msg.created}}</small>
+                                    <small class="text-muted"><i class="fa fa-clock-o">{{msg.created}}</i></small>
                                 </p>
                             </div>
                             <div class="timeline-body">
@@ -64,16 +68,14 @@
                             </div>
                         </div>
                     </li>
-                    
+
                 </ul>
             </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                
-            </div>
         </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
+        <div class="modal-footer">
 
+        </div>
+    </div>
+    <!-- /.modal-content -->
+</div>
+<!-- /.modal-dialog -->
