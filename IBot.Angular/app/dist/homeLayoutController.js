@@ -29,11 +29,13 @@ var homeLayoutController = function() {
     },
     postMessage: function() {
       var $__3 = this;
+      this.loading = true;
       this.$http({
         method: 'POST',
         url: 'https://directline.botframework.com/api/conversations/' + this.conversationId + '/messages',
         data: {"text": this.message}
       }).then(function(data) {
+        $__3.loading = false;
         $__3.getRequestCounter = 0;
         if (!$__3.isRetrivalStart) {
           $__3.getMessages();

@@ -40,6 +40,7 @@ export default class homeLayoutController{
     }
 
     postMessage() {
+        this.loading = true;
         this.$http({
             method: 'POST',
             url: 'https://directline.botframework.com/api/conversations/'+ this.conversationId + '/messages',
@@ -48,6 +49,7 @@ export default class homeLayoutController{
                 "text": this.message
             } 
         }).then(data => {
+            this.loading = false;
             this.getRequestCounter = 0;
             if (!this.isRetrivalStart) {
                 this.getMessages();

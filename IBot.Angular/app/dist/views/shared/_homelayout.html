@@ -30,7 +30,7 @@
     <div class="input-group">
         <input type="text" class="form-control" placeholder="Message..." ng-model="model.message" enter-press="model.postMessage()">
         <span class="input-group-btn">
-            <button class="btn btn-default" type="button" ng-click="model.postMessage()">Send</button>
+            <button class="btn btn-primary" type="button" ng-click="model.postMessage()"><span ng-show="model.loading" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>Send</button>
         </span>
 
     </div>
@@ -52,8 +52,8 @@
                         <div ng-class="{'timeline-badge': true, 'warning': msg.from == model.botName, 'success':msg.from != model.botName}">
                             <i class="fa fa-check">
                                 <span ng-if="msg.from == model.botName">bot</span>
-                                    <span ng-if="msg.from != model.botName">you</span>
-                                
+                                <span ng-if="msg.from != model.botName">you</span>
+
                             </i>
                         </div>
                         <div class="timeline-panel">
@@ -70,11 +70,11 @@
                     </li>
 
                 </ul>
+            </div><div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>
-        <div class="modal-footer">
 
-        </div>
     </div>
     <!-- /.modal-content -->
 </div>
