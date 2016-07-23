@@ -1,6 +1,7 @@
 ﻿using System;
 using Autofac;
 using IBot.Core.Repositories;
+using IBot.Core.Services;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
@@ -13,6 +14,7 @@ namespace IBot.Core
         {
             base.Load(builder);
             builder.RegisterType<LuisProcessEngine>().AsImplementedInterfaces().InstancePerLifetimeScope();
+            builder.RegisterType<SlackChannelDataService>().AsImplementedInterfaces();
             builder.RegisterGeneric(typeof(InMemoryRepository<>)).AsImplementedInterfaces().SingleInstance();
 
             builder.Register<ILogger>((c, p) => new LoggerConfiguration()

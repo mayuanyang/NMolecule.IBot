@@ -7,6 +7,7 @@ using IBot.Core;
 using IBot.Core.Entities;
 using IBot.Core.Forms;
 using IBot.Core.Repositories;
+using IBot.Core.Services;
 using IBot.Web.Dto;
 using Microsoft.Bot.Builder.FormFlow;
 using Microsoft.Bot.Connector;
@@ -21,13 +22,15 @@ namespace IBot.Web
         private readonly IRepository<Account> _accRepository;
         private readonly IRepository<Transaction> _txRepository;
         private readonly ILogger _logger;
+        private readonly IChannelDataService<SlackChannelDataContract> _slaceChannelDataService;
 
-        public MessagesController(ILuisProcessEngine engine, IRepository<Account> accRepository, IRepository<Transaction> txRepository, ILogger logger)
+        public MessagesController(ILuisProcessEngine engine, IRepository<Account> accRepository, IRepository<Transaction> txRepository, ILogger logger, IChannelDataService<SlackChannelDataContract> slaceChannelDataService )
         {
             _engine = engine;
             _accRepository = accRepository;
             _txRepository = txRepository;
             _logger = logger;
+            _slaceChannelDataService = slaceChannelDataService;
             if (_accRepository.List.Count == 0)
             {
                 var cusId = Guid.NewGuid();
@@ -67,34 +70,42 @@ namespace IBot.Web
         /// POST: api/Messages
         /// Receive a message from a user and reply to it
         /// </summary>
-        public async Task Post([FromBody]Activity message)
+        public async Task Post([FromBody]Activity activity)
         {
             try
             {
-
-                var serviceUri = new Uri(message.ServiceUrl);
+                var serviceUri = new Uri(activity.ServiceUrl);
                 var connector = new ConnectorClient(serviceUri);
+                //await connector.Conversations.SendToConversationAsync(activity.CreateReply($"The channel Id is {activity.ChannelId}"));
                 
-                if (message.Type.ToUpper() == "MESSAGE")
+                if (activity.Type.ToUpper() == "MESSAGE")
                 {
                     
-                    var luis = await _engine.ProcessMessage(message);
+                    var luis = await _engine.ProcessMessage(activity);
 
                     if (luis.intents[0].intent == "GetAccountInfo")
                     {
                         if (luis.entities.Length > 0)
                         {
-                            var msg = message.CreateReply("Here is your account information");
+                            var reply = activity.CreateReply($"You typed: {activity.Text}    Reply: Here is your account information");
                             var account = _accRepository.SingleOrDefault(x => x.AccountId == luis.entities[0].entity);
-                            msg.ChannelData = account;
-                            msg.Attachments = new List<Attachment>();
-                            msg.Attachments.Add(new Attachment("application/json", "", account));
-                            await connector.Conversations.SendToConversationAsync(msg);
+                            if (activity.ChannelId == "slack")
+                            {
+                                reply.ChannelData = await _slaceChannelDataService.GenerateChannelSpecificData(reply, account);
+                            }
+                            else
+                            {
+                                reply.ChannelData = account;
+                            }
+                            
+                            reply.Attachments = new List<Attachment>();
+                            reply.Attachments.Add(new Attachment("application/json", "", account));
+                            await connector.Conversations.SendToConversationAsync(reply);
                            
                         }
                         else
                         {
-                            await connector.Conversations.SendToConversationAsync(message.CreateReply("Sorry, we cannot find the account by the given account Id"));
+                            await connector.Conversations.SendToConversationAsync(activity.CreateReply($"You typed: {activity.Text}    Reply: Sorry, we cannot find the account by the given account Id"));
                         }
                         
                     }
@@ -108,32 +119,40 @@ namespace IBot.Web
                             //userData.SetProperty("Data", account);
                             //await stateClient.BotState.SetUserDataAsync(message.ChannelId, message.From.Id, userData);
                             var payments = _txRepository.Where(x => x.AccountId == luis.entities[0].entity).ToList();
-                            var msg =
-                                message.CreateReply(
-                                    $"The intent is {luis.intents[0].intent} and entity is {luis.entities[0].entity}");
-                            msg.ChannelData = new PaymentData(luis.entities[0].entity, payments);
+                            var reply =
+                                activity.CreateReply(
+                                    $"You typed: {activity.Text}    Reply: Here is the payments information");
+
+                            if (activity.ChannelId == "slack")
+                            {
+                                reply.ChannelData = await _slaceChannelDataService.GenerateChannelSpecificData(reply, new PaymentData(luis.entities[0].entity, payments));
+                            }
+                            else
+                            {
+                                reply.ChannelData = new PaymentData(luis.entities[0].entity, payments);
+                            }
                             
-                            await connector.Conversations.SendToConversationAsync(msg);
+                            await connector.Conversations.SendToConversationAsync(reply);
                         }
                         else
                         {
-                            var msg = message.CreateReply("I don't understand what you are after, please at least provide a Ual");
-                            await connector.Conversations.SendToConversationAsync(msg);
+                            var reply = activity.CreateReply($"You typed: {activity.Text}    Reply: I don't understand what you are after, please at least provide a Ual");
+                            await connector.Conversations.SendToConversationAsync(reply);
                         }
                     }
                     if (luis.intents[0].intent == "AddPayment")
                     {
-                        await connector.Conversations.SendToConversationAsync(message.CreateReply($"The intent is {luis.intents[0].intent} and entity is {luis.entities[0].entity}"));
+                        await connector.Conversations.SendToConversationAsync(activity.CreateReply($"The intent is {luis.intents[0].intent} and entity is {luis.entities[0].entity}"));
                     }
                     if(luis.intents[0].intent == "SendRecReport")
                     {
-                        await connector.Conversations.SendToConversationAsync(message.CreateReply($"I will send you the report shortly to your email"));
+                        await connector.Conversations.SendToConversationAsync(activity.CreateReply($"You typed: {activity.Text}    Reply: I will send you the report shortly to your email"));
                     }
                   
                 }
                 else
                 {
-                    await connector.Conversations.SendToConversationAsync(HandleSystemMessage(message));
+                    await connector.Conversations.SendToConversationAsync(HandleSystemMessage(activity));
                 }
                 
             }

@@ -10,13 +10,14 @@ var homeLayoutController = function() {
     this.models = [];
     this.watermark = 0;
     this.getRequestCounter = 0;
+    this.from = '';
     this.receivedMessageIds = [];
+    this.isRetrivalStart = false;
     this.getRequestToken().success(function(data) {
       $__3.token = data;
     });
     this.startConversation().success(function(data) {
       $__3.conversationId = data.conversationId;
-      $__3.getMessages();
     });
   }
   return ($traceurRuntime.createClass)(homeLayoutController, {
@@ -33,8 +34,11 @@ var homeLayoutController = function() {
         url: 'https://directline.botframework.com/api/conversations/' + this.conversationId + '/messages',
         data: {"text": this.message}
       }).success(function(data) {
-        $__3.message = '';
         $__3.getRequestCounter = 0;
+        $__3.message = '';
+        if (!$__3.isRetrivalStart) {
+          $__3.getMessages();
+        }
       });
     },
     getMessages: function() {
@@ -42,19 +46,23 @@ var homeLayoutController = function() {
       var var_1 = this.$interval(function() {
         self.$http.get('https://directline.botframework.com/api/conversations/' + self.conversationId + '/messages?watermark=' + self.watermark).success(function(data) {
           for (var i in data.messages) {
-            console.log(i);
             var msg = data.messages[i];
+            if (self.from === '') {
+              self.from = msg.from;
+            }
+            console.log(msg);
             if (self.receivedMessageIds.indexOf(msg.id) == -1) {
               self.receivedMessageIds.push(msg.id);
-              self.messages.push(msg.text);
+              self.messages.push(msg);
               if (msg.channelData) {
                 var result = {
                   data: msg.channelData,
                   name: msg.text
                 };
                 self.models.push(result);
-                console.log('message added');
               }
+            } else {
+              console.log('Already handled: ' + msg.id);
             }
           }
           self.getRequestCounter += 1;

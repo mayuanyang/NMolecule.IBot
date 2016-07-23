@@ -9,7 +9,9 @@ export default class homeLayoutController{
         this.models = [];
         this.watermark = 0;
         this.getRequestCounter = 0;
+        this.from = '';
         this.receivedMessageIds = [];
+        this.isRetrivalStart = false;
         //this.showDemoData();
 
         this.getRequestToken()
@@ -21,7 +23,7 @@ export default class homeLayoutController{
         this.startConversation()
             .success(data => {
                 this.conversationId = data.conversationId;
-                this.getMessages();
+                //this.getMessages();
             });
 		
 		
@@ -46,8 +48,11 @@ export default class homeLayoutController{
                 "text": this.message
             } 
         }).success(data => {
-            this.message = '';
             this.getRequestCounter = 0;
+            this.message = '';
+            if (!this.isRetrivalStart) {
+                this.getMessages();
+            }
         });
     }
 
@@ -57,21 +62,28 @@ export default class homeLayoutController{
 		    self.$http.get('https://directline.botframework.com/api/conversations/' + self.conversationId + '/messages?watermark=' + self.watermark)
 		        .success(data => {
 		            for(var i in data.messages) {
-		                console.log(i);
+		                //console.log(i);
 		                var msg = data.messages[i];
-		                //console.log(msg);
+                        if (self.from === '') {
+                            self.from = msg.from;
+                        }
+		                
+		                console.log(msg);
 		                if (self.receivedMessageIds.indexOf(msg.id) == -1) {
 		                    self.receivedMessageIds.push(msg.id);
-		                    self.messages.push(msg.text);
+                            
+		                    self.messages.push(msg);
 		                    if (msg.channelData) {
-		                    
+
 		                        var result = {
 		                            data: msg.channelData,
 		                            name: msg.text
 		                        };
 		                        self.models.push(result);
-		                        console.log('message added');
+		                        //console.log('message added');
 		                    }
+		                } else {
+		                    console.log('Already handled: ' + msg.id);
 		                }
 		                
 		            }
