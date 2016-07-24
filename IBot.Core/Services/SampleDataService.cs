@@ -41,6 +41,7 @@ namespace IBot.Core.Services
                             PaymentProcessor = ((PaymentProcessor)new Random(j).Next(3)).ToString(),
                             TransactionId = Guid.NewGuid(),
                             TransactionStatus = ((TransactionStatus)new Random(j).Next(2)).ToString(),
+                            TransactionDate = DateTime.Today
                             
                         };
                         tx.PaymentProcessor = tx.TransactionType == "Charge" ? "" : tx.PaymentProcessor;

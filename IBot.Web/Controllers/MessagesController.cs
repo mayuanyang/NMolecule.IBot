@@ -10,13 +10,15 @@ using IBot.Core.Forms;
 using IBot.Core.Repositories;
 using IBot.Core.Services;
 using IBot.Web.Dto;
+using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Dialogs.Internals;
 using Microsoft.Bot.Builder.FormFlow;
 using Microsoft.Bot.Connector;
 using Serilog;
 
 namespace IBot.Web
 {
-
+    
     public class MessagesController : ApiController
     {
         private readonly ILuisProcessEngine _engine;
@@ -24,20 +26,24 @@ namespace IBot.Web
         private readonly IChannelDataService<SlackChannelDataContract> _slaceChannelDataService;
         private readonly ITransactionService _txService;
         private readonly IAccountService _accountService;
-
-        public MessagesController(ILuisProcessEngine engine, ILogger logger, IChannelDataService<SlackChannelDataContract> slaceChannelDataService, ITransactionService txService, IAccountService accountService )
+        private static IRepository<Transaction> _txRepository;
+        
+        public MessagesController(ILuisProcessEngine engine, ILogger logger, IChannelDataService<SlackChannelDataContract> slaceChannelDataService, ITransactionService txService, IAccountService accountService, IRepository<Transaction> txRepository)
         {
             _engine = engine;
             _logger = logger;
             _slaceChannelDataService = slaceChannelDataService;
             _txService = txService;
             _accountService = accountService;
-            
+            _txRepository = txRepository;
         }
 
-        static IFormDialog<PaymentForm> MakeAddPaymentFormDialog()
+ 
+        static IDialog<PaymentForm> MakeAddPaymentFormDialog()
         {
-            return FormDialog.FromForm(PaymentForm.MakeForm);
+            var dialog = Chain.From(() => FormDialog.FromForm(PaymentForm.MakeForm));
+            PaymentForm.TransactionRepository = _txRepository;
+            return dialog;
         }
 
         /// <summary>
@@ -54,9 +60,21 @@ namespace IBot.Web
                 
                 if (activity.Type.ToUpper() == "MESSAGE")
                 {
-                    var luis = await _engine.ProcessMessage(activity);
-
-                    if (luis.intents[0].intent == "GetAccountInfo")
+                    var intend = "";
+                    var stateClient = activity.GetStateClient();
+                    var userData = await stateClient.BotState.GetUserDataAsync(activity.ChannelId, activity.From.Id);
+                    Luis luis = null;
+                    if (userData.GetProperty<bool>("IsInDialog"))
+                    {
+                        intend = "AddPayment";
+                    }
+                    else
+                    {
+                        luis = await _engine.ProcessMessage(activity);
+                        intend = luis.intents[0].intent;
+                    }
+                        
+                    if (intend == "GetAccountInfo")
                     {
                         if (luis.entities.Length > 0)
                         {
@@ -86,7 +104,7 @@ namespace IBot.Web
                         }
                         
                     }
-                    if (luis.intents[0].intent == "GetPayments")
+                    if (intend == "GetPayments")
                     {
                         if (luis.entities.Length > 0)
                         {
@@ -97,7 +115,7 @@ namespace IBot.Web
                                 return Request.CreateResponse(HttpStatusCode.NoContent);
                             }
                             var payments = _txService.Search(luis);
-                            var reply = activity.CreateReply($"Here is the payments information");
+                            var reply = activity.CreateReply($"Here is the transactions information");
 
                             if (activity.ChannelId == "slack" || activity.ChannelId == "emulator")
                             {
@@ -115,12 +133,20 @@ namespace IBot.Web
                             await NoUalFound(activity, connector);
                         }
                     }
-                    if (luis.intents[0].intent == "AddPayment")
+                    if (intend == "AddPayment")
                     {
-                        await connector.Conversations.SendToConversationAsync(activity.CreateReply($"The intent is {luis.intents[0].intent} and entity is {luis.entities[0].entity}"));
-                        
+                        var isQuit = activity.Text.ToUpper() == "QUIT";
+                        if (isQuit)
+                        {
+                            await stateClient.BotState.DeleteStateForUserAsync(activity.ChannelId, activity.From.Id);
+                            await connector.Conversations.SendToConversationAsync(activity.CreateReply($"See you"));
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        userData.SetProperty("IsInDialog", true);
+                        await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
+                        await Conversation.SendAsync(activity, MakeAddPaymentFormDialog);
                     }
-                    if(luis.intents[0].intent == "SendRecReport")
+                    if(intend == "SendRecReport")
                     {
                         await connector.Conversations.SendToConversationAsync(activity.CreateReply($"I will send you the report shortly to your email"));
                     }

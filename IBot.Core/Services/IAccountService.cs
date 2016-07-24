@@ -12,10 +12,12 @@ namespace IBot.Core.Services
     class AccountService : IAccountService
     {
         private readonly IRepository<Account> _accRepository;
+        private readonly IRepository<Transaction> _txRepository;
 
-        public AccountService(IRepository<Account> accRepository)
+        public AccountService(IRepository<Account> accRepository, IRepository<Transaction> txRepository)
         {
             _accRepository = accRepository;
+            _txRepository = txRepository;
         }
 
         public Account GetAccount(Luis luis)
@@ -23,7 +25,15 @@ namespace IBot.Core.Services
             var ual = luis.entities.FirstOrDefault(x => x.type.ToUpper() == "UAL");
             if (ual == null)
                 return null;
-            return _accRepository.SingleOrDefault(x => x.AccountId == ual.entity);
+            var acc = _accRepository.SingleOrDefault(x => x.AccountId == ual.entity);
+            if (acc != null)
+            {
+                var transactions = _txRepository.Where(x => x.AccountId == ual.entity).ToList();
+                var balance = transactions.Sum(x => (x.TransactionType == TransactionType.Charge.ToString()) ? -x.Amount : x.Amount);
+                acc.CurrentBalance = balance;
+                return acc;
+            }
+            return null;
         }
     }
 }
