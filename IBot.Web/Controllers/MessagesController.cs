@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using IBot.Core;
@@ -42,7 +44,7 @@ namespace IBot.Web
         /// POST: api/Messages
         /// Receive a message from a user and reply to it
         /// </summary>
-        public async Task Post([FromBody]Activity activity)
+        public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
             try
             {
@@ -92,12 +94,12 @@ namespace IBot.Web
                             if (ual == null)
                             {
                                 await NoUalFound(activity, connector);
-                                return;
+                                return Request.CreateResponse(HttpStatusCode.NoContent);
                             }
                             var payments = _txService.Search(luis);
                             var reply = activity.CreateReply($"Here is the payments information");
 
-                            if (activity.ChannelId == "slack")
+                            if (activity.ChannelId == "slack" || activity.ChannelId == "emulator")
                             {
                                 reply.ChannelData = await _slaceChannelDataService.GenerateChannelSpecificData(reply, new PaymentData(luis.entities[0].entity, payments));
                             }
@@ -116,6 +118,7 @@ namespace IBot.Web
                     if (luis.intents[0].intent == "AddPayment")
                     {
                         await connector.Conversations.SendToConversationAsync(activity.CreateReply($"The intent is {luis.intents[0].intent} and entity is {luis.entities[0].entity}"));
+                        
                     }
                     if(luis.intents[0].intent == "SendRecReport")
                     {
@@ -127,13 +130,13 @@ namespace IBot.Web
                 {
                     await connector.Conversations.SendToConversationAsync(HandleSystemMessage(activity));
                 }
-                
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, "An error has occured");
-                //throw;
-                
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+
             }
         }
 

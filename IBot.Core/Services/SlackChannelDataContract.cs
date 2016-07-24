@@ -19,12 +19,17 @@ namespace IBot.Core.Services
                 var value = f.GetValue(data, null);
                 fieldsToReturn.Add(new Field {title = title, value = value.ToString()});
             }
-            channelData = new Channeldata {text=_activity.Text, attachments = new [] {new Attachment
+            text = activity.Text;
+            attachments = new[]
             {
-                title = "",
-                fields = fieldsToReturn.ToArray(),
-                
-            } } };
+                new Attachment
+                {
+                    title = "",
+                    fields = fieldsToReturn.ToArray(),
+
+                }
+            };
+
         }
 
         public string type => "message";
@@ -33,7 +38,8 @@ namespace IBot.Core.Services
         public Conversation conversation => new Conversation {id = _activity.Conversation.Id, topic = _activity.Conversation.Name};
         public From from => new From {id=_activity.From.Id, name = _activity.From.Name};
         public Recipient recipient => new Recipient {id=_activity.Recipient.Id, name = _activity.Recipient.Name};
-        public Channeldata channelData { get; set; }
+        public string text { get; set; }
+        public Attachment[] attachments { get; set; }
 
 
         public class Conversation
@@ -52,12 +58,6 @@ namespace IBot.Core.Services
         {
             public string id { get; set; }
             public string name { get; set; }
-        }
-
-        public class Channeldata
-        {
-            public string text { get; set; }
-            public Attachment[] attachments { get; set; }
         }
 
         public class Attachment
