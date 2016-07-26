@@ -68,6 +68,7 @@ namespace IBot.Core.Services
 
         private Task OnPlayPromptCompleted(PlayPromptOutcomeEvent playPromptOutcomeEvent)
         {
+            _logger.Information(nameof(OnPlayPromptCompleted));
             var callStateForClient = _callStateMap[playPromptOutcomeEvent.ConversationResult.Id];
             callStateForClient.InitiallyChosenMenuOption = null;
             SetupInitialMenu(playPromptOutcomeEvent.ResultingWorkflow);
@@ -77,6 +78,7 @@ namespace IBot.Core.Services
 
         private Task OnRecordCompleted(RecordOutcomeEvent recordOutcomeEvent)
         {
+            _logger.Information(nameof(OnRecordCompleted));
             var id = Guid.NewGuid().ToString();
             recordOutcomeEvent.ResultingWorkflow.Actions = new List<ActionBase>
                 {
@@ -90,6 +92,7 @@ namespace IBot.Core.Services
 
         private Task OnRecognizeCompleted(RecognizeOutcomeEvent recognizeOutcomeEvent)
         {
+            _logger.Information(nameof(OnRecognizeCompleted));
             var callStateForClient = _callStateMap[recognizeOutcomeEvent.ConversationResult.Id];
 
             switch (callStateForClient.InitiallyChosenMenuOption)
@@ -115,6 +118,7 @@ namespace IBot.Core.Services
 
         private void SetupInitialMenu(Workflow workflow)
         {
+            _logger.Information(nameof(SetupInitialMenu));
             workflow.Actions = new List<ActionBase> { CreateIvrOptions(IvrOptions.MainMenuPrompt, 5, false) };
         }
 
@@ -245,6 +249,7 @@ namespace IBot.Core.Services
 
         private static Recognize CreateIvrOptions(string textToBeRead, int numberOfOptions, bool includeBack)
         {
+            
             if (numberOfOptions > 9)
                 throw new Exception("too many options specified");
 

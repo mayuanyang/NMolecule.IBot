@@ -152,6 +152,10 @@ namespace IBot.Web
                     {
                         await connector.Conversations.SendToConversationAsync(activity.CreateReply($"I will send you the report shortly to your email"));
                     }
+                    if (intend == "Greet")
+                    {
+                        await connector.Conversations.SendToConversationAsync(activity.CreateReply("How can i help you?"));
+                    }
                   
                 }
                 else
