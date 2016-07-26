@@ -19,6 +19,7 @@ using Serilog;
 namespace IBot.Web
 {
     
+    [BotAuthentication]
     public class MessagesController : ApiController
     {
         private readonly ILuisProcessEngine _engine;
@@ -54,6 +55,7 @@ namespace IBot.Web
         {
             try
             {
+                _logger.Information($"Handling message {activity.Text}");
                 var serviceUri = new Uri(activity.ServiceUrl);
                 var connector = new ConnectorClient(serviceUri);
                 //await connector.Conversations.SendToConversationAsync(activity.CreateReply($"The channel Id is {activity.ChannelId}"));

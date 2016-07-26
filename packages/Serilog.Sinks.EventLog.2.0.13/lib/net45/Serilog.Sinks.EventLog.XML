@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Serilog.Sinks.EventLog</name>
+    </assembly>
+    <members>
+        <member name="T:Serilog.LoggerConfigurationEventLogExtensions">
+            <summary>
+            Adds the WriteTo.EventLog() extension method to <see cref="T:Serilog.LoggerConfiguration"/>.
+            </summary>
+        </member>
+        <member name="M:Serilog.LoggerConfigurationEventLogExtensions.EventLog(Serilog.Configuration.LoggerSinkConfiguration,System.String,System.String,System.String,System.Boolean,System.String,System.IFormatProvider,Serilog.Events.LogEventLevel)">
+            <summary>
+            Adds a sink that writes log events to the Windows event log.
+            </summary>
+            <param name="loggerConfiguration">The logger configuration.</param>
+            <param name="source">The source name by which the application is registered on the local computer. </param>
+            <param name="logName">The name of the log the source's entries are written to. Possible values include Application, System, or a custom event log. </param>
+            <param name="machineName">The name of the machine hosting the event log written to.  The local machine by default.</param>
+            <param name="manageEventSource">If false does not check/create event source.  Defaults to true i.e. allow sink to manage event source creation</param>
+            <param name="outputTemplate">A message template describing the format used to write to the sink.  The default is "{Timestamp} [{Level}] {Message}{NewLine}{Exception}".</param>
+            <param name="restrictedToMinimumLevel">The minimum log event level required in order to write an event to the sink.</param>
+            <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
+            <returns>Logger configuration, allowing configuration to continue.</returns>
+            <exception cref="T:System.ArgumentNullException">A required parameter is null.</exception>
+        </member>
+        <member name="T:Serilog.Sinks.EventLog.EventLogSink">
+            <summary>
+            Writes log events as documents to the Windows event log.
+            </summary>
+            <remarks>Be aware of changing the source/logname, see: http://stackoverflow.com/questions/804284/how-do-i-write-to-a-custom-windows-event-log?rq=1</remarks>
+        </member>
+        <member name="M:Serilog.Sinks.EventLog.EventLogSink.#ctor(System.String,System.String,Serilog.Formatting.ITextFormatter,System.String,System.Boolean)">
+            <summary>
+            Construct a sink posting to the Windows event log, creating the specified <paramref name="source"/> if it does not exist.
+            </summary>
+            <param name="source">The source name by which the application is registered on the local computer. </param>
+            <param name="logName">The name of the log the source's entries are written to. Possible values include Application, System, or a custom event log.</param>
+            <param name="textFormatter">Supplies culture-specific formatting information, or null.</param>
+            <param name="machineName">The name of the machine hosting the event log written to.</param>
+            <param name="manageEventSource">If false does not check/create event source.  Defaults to true i.e. allow sink to manage event source creation</param>
+        </member>
+        <member name="M:Serilog.Sinks.EventLog.EventLogSink.Emit(Serilog.Events.LogEvent)">
+            <summary>
+            Emit the provided log event to the sink.
+            </summary>
+            <param name="logEvent">The log event to write.</param>
+            <remarks>
+            <see cref="F:Serilog.Events.LogEventLevel.Debug" />, <see cref="F:Serilog.Events.LogEventLevel.Information" /> and <see cref="F:Serilog.Events.LogEventLevel.Verbose" /> are registered as <see cref="F:System.Diagnostics.EventLogEntryType.Information" />.
+            <see cref="F:Serilog.Events.LogEventLevel.Error" />, <see cref="F:Serilog.Events.LogEventLevel.Fatal" /> are registered as <see cref="F:System.Diagnostics.EventLogEntryType.Error" />.
+            <see cref="F:Serilog.Events.LogEventLevel.Warning" /> are registered as <see cref="F:System.Diagnostics.EventLogEntryType.Warning" />.
+            The Event ID in the Windows log will be set to the integer value of the <paramref name="logEvent"/>'s <see cref="P:Serilog.Events.LogEvent.Level"/> property, so that the log can be filtered with more granularity.</remarks>
+        </member>
+    </members>
+</doc>

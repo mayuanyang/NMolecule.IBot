@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using IBot.Core.Repositories;
 using IBot.Core.Services;
 using Serilog;
@@ -20,7 +21,8 @@ namespace IBot.Core
 
             builder.Register<ILogger>((c, p) => new LoggerConfiguration()
             .WriteTo.Seq("http://localhost:5341", LogEventLevel.Debug)
-               .CreateLogger())
+            .WriteTo.RollingFile(AppDomain.CurrentDomain.GetData("APPBASE").ToString() + "/Logs/Log-{Date}.txt")
+            .CreateLogger())
                .SingleInstance();
         }
     }
