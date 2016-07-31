@@ -27,7 +27,7 @@ myApp.config(['$stateProvider', '$urlRouterProvider','$httpProvider', function($
 	// Now set up the states
         $stateProvider
             .state('home', {
-                url: "/",
+                url: "/:showMic",
                 templateUrl: "views/shared/_homelayout.html",
                 controller: "homeLayoutController as model"
             });

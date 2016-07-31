@@ -8,7 +8,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Company AI Demo</a>
+                <a class="navbar-brand" href="#">Microsoft Bot Direct Line Demo</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
                 <ul class="nav navbar-nav">
@@ -31,14 +31,10 @@
         <input type="text" class="form-control" placeholder="Message..." ng-model="model.message" enter-press="model.postMessage()">
         <span class="input-group-btn">
             <button class="btn btn-primary" type="button" ng-click="model.postMessage()"><span ng-show="model.loading" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>Send</button>
-            <button class="btn btn-primary" type="button" ng-click="model.start()"><span ng-show="model.listening" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>Mic</button>
+            <button class="btn btn-warning" type="button" ng-click="model.start()" ng-if="model.showMic"><span ng-show="model.listening" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>Mic</button>
         </span>
 
     </div>
-    <div>
-        <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xml:lang="en-US"><voice name="Microsoft Server Speech Text to Speech Voice (en-US, ZiraRUS)">Enter or paste the text to be synthesized into speech.</voice></speak>
-    </div>
-
 </div>
 
 <div id="myModal" class="modal fade">

@@ -14,6 +14,7 @@ export default class homeLayoutController{
         this.botName = 'd5d2748d-ea5c-4cec-8cc3-1c3fcf8ba2fd';
         this.receivedMessageIds = [];
         this.isRetrivalStart = false;
+        this.showMic = $stateParams.showMic;
         //this.showDemoData();
 
         this.client = null;
@@ -146,7 +147,7 @@ export default class homeLayoutController{
             client.startMicAndRecognition();
             var timeoutFunction = function() {
                 console.log('done');
-                current.message = 'Finish recording';
+                //current.message = 'Finish recording';
                 client.endMicAndRecognition();
             };
             this.$timeout(timeoutFunction, 5000);
@@ -160,12 +161,9 @@ export default class homeLayoutController{
         var fn = function(response) {
             current.listening = false;
             console.log(' client.onFinalResponseReceived');
-            console.log(current);
             console.log(response[0].display);
             current.message += (response[0].display);
-            current.$scope.$apply(function() {
-                current.message = 'hello world';
-            });
+            current.$scope.$apply();
         };
 
         client.onFinalResponseReceived = fn;
@@ -173,6 +171,8 @@ export default class homeLayoutController{
         client.onIntentReceived = function (response) {
             current.message += response;
         };
+
+       
     }
 
     
