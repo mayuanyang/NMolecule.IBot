@@ -9,26 +9,21 @@ using Serilog;
 
 namespace IBot.Core.Services
 {
-    public class SimpleIVRBot : IDisposable, ICallingBot
+    public class MakePaymentIvrBot : IDisposable, ICallingBot
     {
         private readonly ILogger _logger;
         // below are the dtmf keys required for each of option, will be used for parsing results of recognize
-        private const string NewClient = "1";
-        private const string Support = "2";
-        private const string Payments = "3";
-        private const string MoreInfo = "4";
-        private const string NewClientOffer = "1";
-        private const string NewClientOrder = "2";
-        private const string SupportOutages = "1";
-        private const string SupportConsultant = "2";
-        private const string PaymentDetails = "1";
-        private const string PaymentNotVisible = "2";
+        private const string MakePayment = "1";
+        private const string CheckAccountBalance = "2";
+        private const string CreditCardPayment = "1";
+        private const string DirectDebitPayment = "2";
+
 
         private readonly Dictionary<string, CallState> _callStateMap = new Dictionary<string, CallState>();
 
         public ICallingBotService CallingBotService { get; private set; }
 
-        public SimpleIVRBot(ICallingBotService callingBotService, ILogger logger)
+        public MakePaymentIvrBot(ICallingBotService callingBotService, ILogger logger)
         {
             _logger = logger;
             _logger.Information("Start SimpleIVRBot");
@@ -36,13 +31,12 @@ namespace IBot.Core.Services
                 throw new ArgumentNullException(nameof(callingBotService));
 
             CallingBotService = callingBotService;
-
             CallingBotService.OnIncomingCallReceived += OnIncomingCallReceived;
             CallingBotService.OnPlayPromptCompleted += OnPlayPromptCompleted;
             CallingBotService.OnRecordCompleted += OnRecordCompleted;
             CallingBotService.OnRecognizeCompleted += OnRecognizeCompleted;
             CallingBotService.OnHangupCompleted += OnHangupCompleted;
-            _logger.Information("Start SimpleIVRBot");
+
         }
 
         private Task OnIncomingCallReceived(IncomingCallEvent incomingCallEvent)
@@ -100,13 +94,7 @@ namespace IBot.Core.Services
                 case null:
                     ProcessMainMenuSelection(recognizeOutcomeEvent, callStateForClient);
                     break;
-                case NewClient:
-                    ProcessNewClientSelection(recognizeOutcomeEvent, callStateForClient);
-                    break;
-                case Support:
-                    ProcessSupportSelection(recognizeOutcomeEvent, callStateForClient);
-                    break;
-                case Payments:
+                case MakePayment:
                     ProcessPaymentsSelection(recognizeOutcomeEvent, callStateForClient);
                     break;
                 default:
@@ -122,20 +110,13 @@ namespace IBot.Core.Services
             workflow.Actions = new List<ActionBase> { CreateIvrOptions(IvrOptions.MainMenuPrompt, 5, false) };
         }
 
-        private Recognize CreateNewClientMenu()
-        {
-            return CreateIvrOptions(IvrOptions.NewClientPrompt, 2, true);
-        }
-
-        private Recognize CreateSupportMenu()
-        {
-            return CreateIvrOptions(IvrOptions.SupportPrompt, 2, true);
-        }
 
         private Recognize CreatePaymentsMenu()
         {
             return CreateIvrOptions(IvrOptions.PaymentPrompt, 2, true);
         }
+
+
 
         private void ProcessMainMenuSelection(RecognizeOutcomeEvent outcome, CallState callStateForClient)
         {
@@ -147,21 +128,18 @@ namespace IBot.Core.Services
 
             switch (outcome.RecognizeOutcome.ChoiceOutcome.ChoiceName)
             {
-                case NewClient:
-                    callStateForClient.InitiallyChosenMenuOption = NewClient;
-                    outcome.ResultingWorkflow.Actions = new List<ActionBase> { CreateNewClientMenu() };
-                    break;
-                case Support:
-                    callStateForClient.InitiallyChosenMenuOption = Support;
-                    outcome.ResultingWorkflow.Actions = new List<ActionBase> { CreateSupportMenu() };
-                    break;
-                case Payments:
-                    callStateForClient.InitiallyChosenMenuOption = Payments;
+                case MakePayment:
+                    callStateForClient.InitiallyChosenMenuOption = MakePayment;
                     outcome.ResultingWorkflow.Actions = new List<ActionBase> { CreatePaymentsMenu() };
                     break;
-                case MoreInfo:
-                    callStateForClient.InitiallyChosenMenuOption = MoreInfo;
-                    outcome.ResultingWorkflow.Actions = new List<ActionBase> { GetPromptForText(IvrOptions.MoreInfoPrompt) };
+                case CheckAccountBalance:
+                    var id = Guid.NewGuid().ToString();
+                    callStateForClient.InitiallyChosenMenuOption = CheckAccountBalance;
+                    outcome.ResultingWorkflow.Actions = new List<ActionBase>
+                    {
+                        new Answer { OperationId = id },
+                        GetPromptForText(IvrOptions.UalPrompt)
+                    };
                     break;
                 default:
                     SetupInitialMenu(outcome.ResultingWorkflow);
@@ -169,57 +147,6 @@ namespace IBot.Core.Services
             }
         }
 
-        private void ProcessNewClientSelection(RecognizeOutcomeEvent outcome, CallState callStateForClient)
-        {
-            if (outcome.RecognizeOutcome.Outcome != Outcome.Success)
-            {
-                outcome.ResultingWorkflow.Actions = new List<ActionBase> { CreateNewClientMenu() };
-                return;
-            }
-            switch (outcome.RecognizeOutcome.ChoiceOutcome.ChoiceName)
-            {
-                case NewClientOffer:
-                    outcome.ResultingWorkflow.Actions = new List<ActionBase>
-                        {
-                            GetPromptForText(IvrOptions.Offer),
-                            CreateNewClientMenu()
-                        };
-                    break;
-                case NewClientOrder:
-                    SetupRecording(outcome.ResultingWorkflow);
-                    break;
-                default:
-                    callStateForClient.InitiallyChosenMenuOption = null;
-                    SetupInitialMenu(outcome.ResultingWorkflow);
-                    break;
-            }
-        }
-
-        private void ProcessSupportSelection(RecognizeOutcomeEvent outcome, CallState callStateForClient)
-        {
-            if (outcome.RecognizeOutcome.Outcome != Outcome.Success)
-            {
-                outcome.ResultingWorkflow.Actions = new List<ActionBase> { CreateSupportMenu() };
-                return;
-            }
-            switch (outcome.RecognizeOutcome.ChoiceOutcome.ChoiceName)
-            {
-                case SupportOutages:
-                    outcome.ResultingWorkflow.Actions = new List<ActionBase>
-                        {
-                            GetPromptForText(IvrOptions.CurrentOutages),
-                            CreateSupportMenu()
-                        };
-                    break;
-                case SupportConsultant:
-                    SetupRecording(outcome.ResultingWorkflow);
-                    break;
-                default:
-                    callStateForClient.InitiallyChosenMenuOption = null;
-                    SetupInitialMenu(outcome.ResultingWorkflow);
-                    break;
-            }
-        }
 
         private void ProcessPaymentsSelection(RecognizeOutcomeEvent outcome, CallState callStateForClient)
         {
@@ -228,17 +155,45 @@ namespace IBot.Core.Services
                 outcome.ResultingWorkflow.Actions = new List<ActionBase> { CreatePaymentsMenu() };
                 return;
             }
+
+            var id = Guid.NewGuid().ToString();
             switch (outcome.RecognizeOutcome.ChoiceOutcome.ChoiceName)
             {
-                case PaymentDetails:
+                case CreditCardPayment:
+
                     outcome.ResultingWorkflow.Actions = new List<ActionBase>
                         {
-                            GetPromptForText(IvrOptions.PaymentDetailsMessage),
-                            CreatePaymentsMenu()
+                        new Answer { OperationId = id },
+                        new Record
+                    {
+                        OperationId = id,
+                        PlayPrompt = GetPromptForText(IvrOptions.CreditCardNumberPrompt),
+                        MaxDurationInSeconds = 10,
+                        InitialSilenceTimeoutInSeconds = 5,
+                        MaxSilenceTimeoutInSeconds = 2,
+                        PlayBeep = true,
+                        StopTones = new List<char> { '#' }
+                    }
+
                         };
                     break;
-                case PaymentNotVisible:
-                    SetupRecording(outcome.ResultingWorkflow);
+                case DirectDebitPayment:
+
+                    outcome.ResultingWorkflow.Actions = new List<ActionBase>
+                        {
+                        new Answer { OperationId = id },
+                        new Record
+                    {
+                        OperationId = id,
+                        PlayPrompt = GetPromptForText(IvrOptions.DirectDebitDetailsPrompt),
+                        MaxDurationInSeconds = 10,
+                        InitialSilenceTimeoutInSeconds = 5,
+                        MaxSilenceTimeoutInSeconds = 2,
+                        PlayBeep = true,
+                        StopTones = new List<char> { '#' }
+                    }
+
+                        };
                     break;
                 default:
                     callStateForClient.InitiallyChosenMenuOption = null;
@@ -249,7 +204,7 @@ namespace IBot.Core.Services
 
         private static Recognize CreateIvrOptions(string textToBeRead, int numberOfOptions, bool includeBack)
         {
-            
+
             if (numberOfOptions > 9)
                 throw new Exception("too many options specified");
 
@@ -276,7 +231,7 @@ namespace IBot.Core.Services
         {
             var id = Guid.NewGuid().ToString();
 
-            var prompt = GetPromptForText(IvrOptions.NoConsultants);
+            var prompt = GetPromptForText(IvrOptions.LeaveMessage);
             var record = new Record
             {
                 OperationId = id,

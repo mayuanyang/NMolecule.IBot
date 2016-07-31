@@ -7,7 +7,6 @@ import httpService from './httpService';
 import guidFactory from './guidFactory';
 import uiboot from './ui-bootstrap-tpls';
 import homeLayoutController from './homeLayoutController';
-
 import dynamicTemplate from './dynamicTemplate';
 import loadDirective from './loadDirective';
 import enterPress from './enterPress';

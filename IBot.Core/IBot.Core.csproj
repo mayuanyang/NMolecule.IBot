@@ -91,6 +91,10 @@
       <HintPath>..\IBot.Web\packages\Serilog.Sinks.Seq.2.0.0\lib\net45\Serilog.Sinks.Seq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SpeechClient, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\Microsoft.ProjectOxford.SpeechRecognition-x86.0.4.10.2\lib\SpeechClient.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=4.0.20622.1351, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -135,7 +139,7 @@
     <Compile Include="Services\LuisProcessEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\SampleDataService.cs" />
-    <Compile Include="Services\SimpleIVRBot.cs" />
+    <Compile Include="Services\MakePaymentIvrBot.cs" />
     <Compile Include="Services\SlackChannelDataContract.cs" />
     <Compile Include="Services\TransactionService.cs" />
   </ItemGroup>

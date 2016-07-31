@@ -20,7 +20,7 @@ namespace IBot.Web.Controllers
             : base()
         {
             _logger = logger;
-            CallingConversation.RegisterCallingBot(c => new SimpleIVRBot(c, _logger));
+            CallingConversation.RegisterCallingBot(c => new MakePaymentIvrBot(c, _logger));
             _logger.Information(nameof(CallingController));
         }
 
