@@ -1,5 +1,5 @@
 {
-  "name": "printquote.angular",
+  "name": "NMolecule.IBot",
   "version": "1.0.0",
   "main": "gulpfile.js",
   "dependencies": {
@@ -9,10 +9,14 @@
     "browserify": "^13.0.1",
     "config.json": "0.0.4",
     "gulp": "^3.9.0",
+    "gulp-connect": "^5.0.0",
     "gulp-load-plugins": "^1.2.4",
+    "gulp-open": "^2.0.0",
     "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^1.6.0",
     "gulp-uglify": "^1.5.1",
-    "through2": "^2.0.0"
+    "through2": "^2.0.0",
+    "vinyl-source-stream": "^1.1.0"
   },
   "devDependencies": {
     "debug": "^2.2.0",
