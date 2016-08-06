@@ -86,9 +86,9 @@ namespace IBot.Core.Services
 
         private Task OnRecognizeCompleted(RecognizeOutcomeEvent recognizeOutcomeEvent)
         {
-            _logger.Information(nameof(OnRecognizeCompleted));
+            _logger.Information("recognizeOutcomeEvent {@recognizeOutcomeEvent}", recognizeOutcomeEvent);
             var callStateForClient = _callStateMap[recognizeOutcomeEvent.ConversationResult.Id];
-
+            _logger.Information("callStateForClient {callStateForClient}", callStateForClient);
             switch (callStateForClient.InitiallyChosenMenuOption)
             {
                 case null:
@@ -133,12 +133,20 @@ namespace IBot.Core.Services
                     outcome.ResultingWorkflow.Actions = new List<ActionBase> { CreatePaymentsMenu() };
                     break;
                 case CheckAccountBalance:
-                    var id = Guid.NewGuid().ToString();
                     callStateForClient.InitiallyChosenMenuOption = CheckAccountBalance;
                     outcome.ResultingWorkflow.Actions = new List<ActionBase>
                     {
-                        new Answer { OperationId = id },
-                        GetPromptForText(IvrOptions.UalPrompt)
+                        new Recognize()
+                    {
+                        OperationId = Guid.NewGuid().ToString(),
+                        PlayPrompt = GetPromptForText(IvrOptions.UalPrompt),
+                        CollectDigits = new CollectDigits() {MaxNumberOfDtmfs = 16, StopTones =new [] { '#' } },
+                        InitialSilenceTimeoutInSeconds = 5,
+                        InterdigitTimeoutInSeconds = 5,
+                        BargeInAllowed = true
+
+                    },
+                        GetPromptForText("Your account balance is $480.00")
                     };
                     break;
                 default:
@@ -163,41 +171,41 @@ namespace IBot.Core.Services
 
                     outcome.ResultingWorkflow.Actions = new List<ActionBase>
                         {
-                        new Answer { OperationId = id },
-                        new Record
+                        new Recognize()
                     {
                         OperationId = id,
                         PlayPrompt = GetPromptForText(IvrOptions.CreditCardNumberPrompt),
-                        MaxDurationInSeconds = 10,
+                        CollectDigits = new CollectDigits() {MaxNumberOfDtmfs = 16, StopTones =new [] { '#' } },
                         InitialSilenceTimeoutInSeconds = 5,
-                        MaxSilenceTimeoutInSeconds = 2,
-                        PlayBeep = true,
-                        StopTones = new List<char> { '#' }
-                    }
+                        InterdigitTimeoutInSeconds = 5,
+                        BargeInAllowed = true,
+                      
+                        
+                    },
+                        
+                        GetPromptForText("Thanks for your payment")
 
-                        };
+            };
                     break;
                 case DirectDebitPayment:
 
                     outcome.ResultingWorkflow.Actions = new List<ActionBase>
                         {
-                        new Answer { OperationId = id },
-                        new Record
+                        new Recognize()
                     {
                         OperationId = id,
-                        PlayPrompt = GetPromptForText(IvrOptions.DirectDebitDetailsPrompt),
-                        MaxDurationInSeconds = 10,
+                        PlayPrompt = GetPromptForText(IvrOptions.CreditCardNumberPrompt),
+                        CollectDigits = new CollectDigits() {MaxNumberOfDtmfs = 16, StopTones =new [] { '#' } },
                         InitialSilenceTimeoutInSeconds = 5,
-                        MaxSilenceTimeoutInSeconds = 2,
-                        PlayBeep = true,
-                        StopTones = new List<char> { '#' }
-                    }
+                        InterdigitTimeoutInSeconds = 5,
+                        BargeInAllowed = true
 
+                    }
                         };
                     break;
                 default:
                     callStateForClient.InitiallyChosenMenuOption = null;
-                    SetupInitialMenu(outcome.ResultingWorkflow);
+                    CreatePaymentsMenu();
                     break;
             }
         }

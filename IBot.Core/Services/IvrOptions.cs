@@ -12,7 +12,7 @@
             "To make credit card payment press 1, to make a direct debit payment press 2. Press the hash key to return to the main menu";
         
 
-        internal const string UalPrompt = "Please key in your UAL";
+        internal const string UalPrompt = "Please key in your UAL follow by the hash key";
         internal const string CreditCardNumberPrompt = "Please key in your credit card number follow by the hash key";
         internal const string CreditCardExpiryDatePrompt = "Please key in your expiry date follow by the hash key";
         internal const string CreditCardCheckDigitPrompt = "Please key in three digit security code follow by the hash key";
